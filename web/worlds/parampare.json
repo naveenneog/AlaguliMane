@@ -1,0 +1,70 @@
+{
+  "id": "parampare",
+  "title": "Parampare — the heritage board",
+  "kannada": "ಪರಂಪರೆ",
+  "subtitle": "carved sheesham & tamarind seeds",
+  "intent": "Counting is the strategy: watch for fours, chain the sowing, and gather the larger harvest.",
+  "era": "original",
+  "theme": {
+    "bg": "#160f06",
+    "board": "#5a3418",
+    "pit": "#2a1810",
+    "seed": "#9a6a2a",
+    "accent": "#c89b4a",
+    "text": "#f4e7cf",
+    "fog": "#160f06",
+    "p0color": "#9a6a2a",
+    "p1color": "#e8ddc4"
+  },
+  "sides": {
+    "p0": {
+      "name": "Hunase",
+      "en": "Tamarind seeds"
+    },
+    "p1": {
+      "name": "Kavade",
+      "en": "Cowrie seeds"
+    }
+  },
+  "voice": {
+    "web": "en-IN",
+    "azure": "en-IN-Arjun:DragonHDLatestNeural"
+  },
+  "teachings": {
+    "start": [
+      {
+        "text": "Two rows of seven pits, six seeds in each. Lift a pit, sow one seed per hole; whenever a hole holds four, they are yours. Count carefully — this game was taught to sharpen young minds."
+      },
+      {
+        "text": "The old grandmothers used this board to teach arithmetic and patience. The seeds do the counting; you do the planning."
+      }
+    ],
+    "capture": [
+      {
+        "text": "A pit reaches four and the seeds are gathered into your store. The whole art is engineering those fours — on your side or the other's.",
+        "en": "The gathering four"
+      },
+      {
+        "text": "Four seeds harvested. Notice how a well-chosen pit sends a chain of drops that ripens hole after hole.",
+        "en": "The ripening chain"
+      },
+      {
+        "text": "Counted and captured. Resource management, one seed at a time — spend a big pit where it will make the most fours.",
+        "en": "Spend where it counts"
+      }
+    ],
+    "win": [
+      {
+        "text": "The board is bare and your store holds the most. You out-counted your rival — the true lesson of Alaguli Mane.",
+        "en": "Out-counted"
+      }
+    ],
+    "lose": [
+      {
+        "text": "The harvest is in and the other store is fuller. Count further ahead next round — the fours were there to be made.",
+        "en": "Count further ahead"
+      }
+    ]
+  },
+  "realistic": true
+}

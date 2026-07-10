@@ -1,0 +1,28 @@
+{
+  "id": "ulita",
+  "title": "Ulita — the savings board",
+  "kannada": "ಉಳಿತ",
+  "subtitle": "a modern reading",
+  "intent": "Cash flow is strategy: move small amounts through your accounts and bank them the moment they group into a matured four.",
+  "era": "modern",
+  "theme": { "bg": "#08130f", "board": "#123028", "pit": "#0c1f19", "seed": "#4bd6a0", "accent": "#4bd6c2", "text": "#e7f5ef", "fog": "#08130f", "p0color": "#4bd6a0", "p1color": "#ffd24a" },
+  "sides": { "p0": { "name": "Householder", "en": "The saver" }, "p1": { "name": "Trader", "en": "The dealer" } },
+  "voice": { "web": "en-IN", "azure": "en-IN-Neerja:DragonHDLatestNeural" },
+  "teachings": {
+    "start": [
+      { "text": "Read the old counting board as money: each pit is an account, each seed a coin. Circulate your coins; whenever an account holds exactly four, it matures and you bank it." },
+      { "text": "Financial sense, on an ancient board — plan the flow, don't just spend the biggest pile first." }
+    ],
+    "capture": [
+      { "text": "An account matures at four and is banked. Wealth is built by grouping small amounts, not by chasing one big pile.", "en": "Grouped and banked" },
+      { "text": "Four coins secured. A single well-timed move can mature several accounts down the line — that is compounding.", "en": "Compounding flow" },
+      { "text": "Banked. Managing the flow beats hoarding; move the seeds so the fours fall to you.", "en": "Manage the flow" }
+    ],
+    "win": [
+      { "text": "The table is settled and your bank holds the most. Steady, planned circulation won it — not luck.", "en": "Steady circulation wins" }
+    ],
+    "lose": [
+      { "text": "The other bank is fuller. Watch where the fours mature next time and route your coins toward them.", "en": "Route toward the fours" }
+    ]
+  }
+}

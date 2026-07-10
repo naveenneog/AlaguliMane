@@ -1,0 +1,8 @@
+{
+  "appId": "com.naveenneog.alagulimane",
+  "appName": "Alaguli Mane",
+  "webDir": "web",
+  "android": {
+    "backgroundColor": "#160f06"
+  }
+}

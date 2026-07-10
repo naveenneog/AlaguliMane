@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Alaguli Mane — the sowing game, reborn in 3D</title>
+  <meta name="theme-color" content="#160f06" />
+  <meta name="description" content="Alaguli Mane (Pallanguzhi) — the ancient South Indian sowing-and-counting game, rebuilt as a glowing 3D board with three worlds: the home board, a savings reading, and a harvest tale." />
+  <meta property="og:title" content="Alaguli Mane — the sowing game in 3D" />
+  <meta property="og:description" content="Sow the seeds, chain the pits, capture every four. An ancient counting game reborn in glowing 3D." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/brand/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png" />
+  <meta property="og:image" content="assets/brand/hero.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <img class="hero-img" src="assets/brand/hero.png" alt="Alaguli Mane — the sowing game" />
+      <div class="kn">ಆಳಗುಳಿ ಮನೆ</div>
+      <h1>Alaguli Mane</h1>
+      <p>The ancient sowing-and-counting game — Pallanguzhi — reborn in glowing 3D. Sow the seeds around
+        fourteen pits, chain the relays, and capture every four. <b>No dice. Only counting.</b></p>
+      <div class="cta">
+        <a class="primary" href="setup.html">Play now →</a>
+        <a class="ghost" href="https://github.com/naveenneog/AlaguliMane/releases/latest/download/AlaguliMane.apk">Android APK</a>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="f"><b>Counting made visible</b><p>Every pit shows its seed count and the sowing plays out
+        seed by seed — the game was a teaching tool for arithmetic, and the rebuild honours that.</p></div>
+      <div class="f"><b>Three worlds, one board</b><p>The <i>Malnad</i> home board, a modern <i>Ulita</i> savings
+        reading, and the <i>Suggi</i> harvest tale — each re-reads counting as maths, money, or patience.</p></div>
+      <div class="f"><b>Glowing 3D &amp; a sharp AI</b><p>Bloom-lit seeds in carved bowls, mobile-first touch, and a
+        minimax opponent that plans the fours several moves ahead.</p></div>
+    </div>
+    <p class="foot">Part of <a href="../index.html">Traditional Board Games</a> · reconstructed with original intent ·
+      built with GitHub Copilot CLI</p>
+  </div>
+  <script>
+    (function () { var img = document.querySelector('.hero-img'); if (!img) return;
+      fetch('assets/brand/intro.mp4', { method: 'HEAD' }).then(function (r) { if (!r.ok) return;
+        var v = document.createElement('video'); v.className = 'hero-img'; v.src = 'assets/brand/intro.mp4';
+        v.poster = img.getAttribute('src'); v.autoplay = v.loop = v.muted = v.playsInline = true;
+        v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); img.replaceWith(v); }).catch(function () {}); })();
+  </script>
+</body>
+</html>

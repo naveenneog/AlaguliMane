@@ -1,0 +1,14 @@
+{
+  "name": "Alaguli Mane — the sowing game",
+  "short_name": "Alaguli Mane",
+  "description": "The ancient South Indian sowing-and-counting game (Pallanguzhi), reborn in glowing 3D.",
+  "start_url": "setup.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#160f06",
+  "theme_color": "#160f06",
+  "icons": [
+    { "src": "assets/brand/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

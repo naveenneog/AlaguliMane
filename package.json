@@ -1,0 +1,22 @@
+{
+  "name": "alaguli-mane",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Alaguli Mane (Pallanguzhi) — the ancient South Indian sowing-and-counting game reborn in glowing 3D. Sow the seeds, chain the pits, capture every four.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "node scripts/serve.mjs",
+    "qa": "node tooling/qa.mjs",
+    "cap:add": "cap add android",
+    "cap:sync": "cap sync android"
+  },
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "devDependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.61.1"
+  }
+}
