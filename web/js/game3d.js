@@ -15,6 +15,7 @@ import { createGrandEffects, playOpening } from './grand.js';
 import { initSettings, applySettings } from './settings.js';
 import { initSave } from './save.js';
 import { createCoachOverlay } from './coach3d.js';
+import { initLearn } from './learn.js';
 import * as audio from './audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -39,7 +40,8 @@ async function main() {
   const pname = (p) => (p === 0 ? world.sides.p0.name : world.sides.p1.name);
   const controls = (p) => mode === 'hotseat' || p === 0;
 
-  let state = newGame(); let busy = true, fast = false, settingsApi = null, save = null;
+  let state = newGame(); let busy = true, fast = false, settingsApi = null, save = null, learn = null;
+  let learning = false, lessonMove = null;
 
   const MOBILE = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 760;
   const renderer = new THREE.WebGLRenderer({ antialias: !MOBILE, powerPreference: 'high-performance' });
@@ -138,26 +140,29 @@ async function main() {
 
   const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
   function onTap(e) {
-    if (busy || state.winner !== null || !controls(state.turn)) return;
+    if (busy || state.winner !== null || (!learning && !controls(state.turn))) return;
     ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObjects([...pitGroups, ...glow], true); if (!hits.length) return;
     let o = hits[0].object; while (o && o.userData.pit === undefined && o.parent) o = o.parent;
     if (!o || o.userData.pit === undefined) return;
     const pit = o.userData.pit; clearHint(); audio.unlock(worldId);
-    if (legalMoves(state).includes(pit)) doMove(pit);
+    if (legalMoves(state).includes(pit) && lessonAllows(pit)) doMove(pit);
   }
+  const lessonAllows = (pit) => !learning || pit === lessonMove;
 
   // ---- move + animate cascade ----
   async function doMove(start) {
-    if (busy) return; busy = true; clearGlow(); clearHint(); updateUndo();
-    const before = state; save.record(); state = applyMove(before, start);
+    if (busy || !lessonAllows(start)) return; busy = true; clearGlow(); clearHint(); updateUndo();
+    const before = state; if (!learning) save.record(); state = applyMove(before, start);
     await animateTurn(before, state.events);
     fullRelayout();
     const captured = state.stores[before.turn] - before.stores[before.turn];
-    if (captured > 0 && state.winner === null) await reveal('capture', rand(world.teachings.capture));
-    save.persist();
-    if (state.winner !== null) { await onWin(); busy = false; return; }
-    busy = false; loop();
+    if (!learning && captured > 0 && state.winner === null) await reveal('capture', rand(world.teachings.capture));
+    if (!learning) save.persist();
+    learn?.notifyMove(start);
+    if (state.winner !== null) { if (!learning) await onWin(); busy = false; updateUndo(); return; }
+    busy = false; updateUndo();
+    if (!learning) loop();
   }
   async function animateTurn(before, events) {
     const dP = before.pits.slice(), dS = before.stores.slice();
@@ -202,7 +207,7 @@ async function main() {
     if (next.stores[state.turn] > state.stores[state.turn]) coach.destination(storePos(state.turn), { radius: 0.68, y: 0.18 });
   }
   function showHint() {
-    if (busy || state.winner !== null || !controls(state.turn)) return;
+    if (learning || busy || state.winner !== null || !controls(state.turn)) return;
     const mv = bestMove(state, Math.max(2, level)); if (mv === null) return; clearHint();
     const ns = applyMove(state, mv); const gained = ns.stores[state.turn] - state.stores[state.turn];
     const txt = gained > 0 ? `Sow the glowing pit — this move gathers ${gained} seed${gained > 1 ? 's' : ''} for you.` : 'Sow the glowing pit — it keeps seeds on your side and sets up future fours.';
@@ -212,7 +217,7 @@ async function main() {
 
   // ---- turn loop ----
   function loop() {
-    if (state.winner !== null) return;
+    if (learning || state.winner !== null) return;
     updateHud();
     if (controls(state.turn)) {
       highlight();
@@ -221,7 +226,9 @@ async function main() {
     } else aiTurn();
   }
   async function aiTurn() {
+    if (learning) return;
     busy = true; updateUndo(); $('#thinking').classList.add('show'); await wait(300);
+    if (learning) { busy = false; $('#thinking').classList.remove('show'); updateUndo(); return; }
     const mv = bestMove(state, level); $('#thinking').classList.remove('show');
     if (mv === null) { busy = false; updateUndo(); return; }
     busy = false;
@@ -245,7 +252,7 @@ async function main() {
     $('#turnLabel').textContent = pname(state.turn); $('#turnDot').style.background = state.turn === 0 ? (T.p0color || T.accent) : (T.p1color || T.seed);
   }
 
-  function restoreState(saved) {
+  function applyStateVisual(saved) {
     busy = true; fast = false; clearGlow(); clearHint(); updateUndo();
     state = saved;
     fullRelayout();
@@ -254,17 +261,23 @@ async function main() {
     $('#thinking').classList.remove('show');
     busy = false;
     updateHud();
-    loop();
     updateUndo();
+  }
+
+  function restoreState(saved) {
+    applyStateVisual(saved);
+    if (!learning) loop();
   }
 
   function updateUndo() {
     const button = $('#undoBtn');
-    if (button) button.disabled = !(save && !busy && state.winner === null && controls(state.turn) && save.canUndo());
+    if (button) button.disabled = !(save && !learning && !busy && state.winner === null && controls(state.turn) && save.canUndo());
+    const learnButton = $('#tbg-learn-btn');
+    if (learnButton) learnButton.disabled = busy && !learning;
   }
 
   function doUndo() {
-    if (busy || state.winner !== null || !controls(state.turn) || !save?.canUndo()) return;
+    if (learning || busy || state.winner !== null || !controls(state.turn) || !save?.canUndo()) return;
     audio.sfx('step');
     save.undo();
     updateUndo();
@@ -298,8 +311,125 @@ async function main() {
     restore: restoreState,
     isMyTurn: (saved) => controls(saved.turn),
   });
+  function lessonState(moves = []) {
+    let next = newGame();
+    for (const move of moves) {
+      if (!legalMoves(next).includes(move)) throw new Error(`Invalid Alaguli Mane lesson move: ${move}`);
+      next = applyMove(next, move);
+    }
+    return next;
+  }
+  const endCaptureReady = lessonState([3, 13]);
+  const fourReady = lessonState([0, 11, 1]);
+  const fourDone = lessonState([0, 11, 1, 10]);
+  const ghostSeed = (pit) => pitPos(pit).add(new THREE.Vector3(0, 0.2, 0));
+  const storeGhosts = (player) => {
+    const base = storePos(player);
+    return seedSlots(4, 0.3).map(([x, z], i) => new THREE.Vector3(base.x + x, 0.2 + i * 0.012, base.z + z));
+  };
+  const lessonSteps = [
+    {
+      en: 'Two rows · six seeds each',
+      text: 'The board has two rows of seven pits, with six seeds in every pit. Counting is your strategy.',
+      position: lessonState(),
+      highlight: ({ coach: c }) => {
+        lessonMove = null;
+        c.destination(pitPos(0), { radius: 0.52 });
+        c.ghosts([0, 1, 2, 3, 4, 5, 6].map(ghostSeed), { role: 'path', radius: 0.075, max: 7 });
+      },
+    },
+    {
+      en: 'Lift and sow',
+      text: 'Lift every seed from one pit and sow one into each following pit.',
+      position: lessonState(),
+      expectedMove: (move) => move === 0,
+      highlight: ({ coach: c }) => {
+        lessonMove = 0;
+        c.destination(pitPos(0), { radius: 0.52 });
+        c.path([0, 1, 2, 3, 4, 5, 6].map(pitPos), { y: 0.21 });
+        c.ghosts([1, 2, 3, 4, 5, 6].map(ghostSeed), { role: 'path', radius: 0.075, max: 6 });
+      },
+    },
+    {
+      en: 'Follow the relay',
+      text: 'If the pit after your last seed is occupied, lift those seeds and continue—the sowing becomes a relay.',
+      position: lessonState(),
+      highlight: ({ coach: c }) => {
+        lessonMove = null;
+        c.destination(pitPos(0), { radius: 0.52 });
+        c.path(Array.from({ length: PITS }, (_, pit) => pitPos(pit)), { y: 0.21 });
+        c.ghosts([1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13].map(ghostSeed), { role: 'path', radius: 0.075, max: 12 });
+      },
+    },
+    {
+      en: 'Gather beyond the empty pit',
+      text: 'Here one seed lands in pit one; pit two is empty, so the seeds beyond it in pit three are gathered.',
+      position: endCaptureReady,
+      expectedMove: (move) => move === 0,
+      highlight: ({ coach: c }) => {
+        lessonMove = 0;
+        c.destination(pitPos(0), { radius: 0.52 });
+        c.path([pitPos(0), pitPos(1), pitPos(2), pitPos(3)], { y: 0.21 });
+        c.ghosts([ghostSeed(1)], { role: 'path', radius: 0.075, max: 1 });
+        c.danger(pitPos(3), { radius: 0.48 });
+        c.destination(storePos(0), { radius: 0.68, y: 0.18 });
+      },
+    },
+    {
+      en: 'Make the fourth seed',
+      text: 'Pit eleven holds three. Sow the single seed from pit ten: the fourth seed completes the set.',
+      position: fourReady,
+      expectedMove: (move) => move === 10,
+      highlight: ({ coach: c }) => {
+        lessonMove = 10;
+        c.destination(pitPos(10), { radius: 0.52 });
+        c.path([pitPos(10), pitPos(11)], { y: 0.21 });
+        c.ghosts([ghostSeed(11)], { role: 'path', radius: 0.075, max: 1 });
+        c.danger(pitPos(11), { radius: 0.48 });
+        c.destination(storePos(1), { radius: 0.68, y: 0.18 });
+      },
+    },
+    {
+      en: 'The gathering four',
+      text: 'All four seeds leave the pit and enter your store. Plan each relay to create more gathering fours.',
+      position: fourDone,
+      highlight: ({ coach: c }) => {
+        lessonMove = null;
+        c.danger(pitPos(11), { radius: 0.48 });
+        c.destination(storePos(1), { radius: 0.68, y: 0.18 });
+        c.ghosts(storeGhosts(1), { role: 'gain', radius: 0.085, max: 4 });
+      },
+    },
+  ];
+  learn = initLearn({
+    id: 'am',
+    title: 'Count, Sow, Gather',
+    accent: T.accent,
+    steps: lessonSteps,
+    hooks: {
+      applyState: applyStateVisual,
+      coach,
+      clearCoach: () => coach.clear(),
+      narrate: (text) => audio.narrate(text, world),
+      setLearning: (active) => {
+        learning = active;
+        lessonMove = null;
+        clearGlow();
+        clearHint();
+        $('#thinking').classList.remove('show');
+        if (active) $('#status').textContent = 'Guided lesson — follow the gold path';
+        updateUndo();
+      },
+      freshGame: () => {
+        save.clear();
+        applyStateVisual(newGame());
+        loop();
+      },
+    },
+  });
+  updateUndo();
   window.__am = {
-    get state() { return state; }, get busy() { return busy; }, world,
+    get state() { return state; }, get busy() { return busy; }, get learning() { return learning; }, world,
     setFast(v) { fast = v; },
     play: (pit) => doMove(pit),
     async autoplay(maxTurns = 120) { fast = true; let n = 0; while (state.winner === null && n < maxTurns) { n++; while (busy) await wait(10); const mv = bestMove(state, 1); if (mv === null) break; await doMove(mv); } fast = false; return { winner: state.winner, stores: state.stores }; },
