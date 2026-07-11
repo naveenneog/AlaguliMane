@@ -12,6 +12,7 @@ import { makePit, makeStore, makeSeed, seedSlots } from './pieces3d.js';
 import { applyEnvironment, addContactShadow, applyRealistic, loadTexture, addTableWorld } from './sky.js';
 import { initTutorial } from './tutorial.js';
 import { createGrandEffects, playOpening } from './grand.js';
+import { initSettings, applySettings } from './settings.js';
 import * as audio from './audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -36,7 +37,7 @@ async function main() {
   const pname = (p) => (p === 0 ? world.sides.p0.name : world.sides.p1.name);
   const controls = (p) => mode === 'hotseat' || p === 0;
 
-  let state = newGame(); let busy = true, fast = false;
+  let state = newGame(); let busy = true, fast = false, settingsApi = null;
 
   const MOBILE = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 760;
   const renderer = new THREE.WebGLRenderer({ antialias: !MOBILE, powerPreference: 'high-performance' });
@@ -58,7 +59,8 @@ async function main() {
   scene.add(key); scene.add(new THREE.AmbientLight(0xffffff, 0.18));
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), REALISTIC ? 0.08 : (MOBILE ? 0.48 : 0.6), 0.9, REALISTIC ? 0.6 : 0.26));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), REALISTIC ? 0.08 : (MOBILE ? 0.48 : 0.6), 0.9, REALISTIC ? 0.6 : 0.26);
+  composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
   // ---- board ----
@@ -160,7 +162,7 @@ async function main() {
     for (const e of events) {
       if (e.type === 'pickup') { dP[e.pit] = 0; relayoutPit(e.pit, 0); audio.sfx('step'); }
       else if (e.type === 'sow') { dP[e.pit] += 1; relayoutPit(e.pit, dP[e.pit]); if (++sinceSound % 4 === 0) audio.sfx('place'); }
-      else if (e.type === 'capture4' || e.type === 'captureEnd') { dS[e.by] += (e.count || 4); dP[e.pit] = 0; relayoutPit(e.pit, 0); relayoutStore(e.by, dS[e.by]); flashPit(e.pit); grand.burst(pitPos(e.pit)); audio.sfx('capture'); }
+      else if (e.type === 'capture4' || e.type === 'captureEnd') { dS[e.by] += (e.count || 4); dP[e.pit] = 0; relayoutPit(e.pit, 0); relayoutStore(e.by, dS[e.by]); flashPit(e.pit); grand.burst(pitPos(e.pit)); settingsApi?.haptic('capture'); audio.sfx('capture'); }
       else if (e.type === 'sweep') { dS[e.by] += e.count; dP[e.pit] = 0; relayoutPit(e.pit, 0); relayoutStore(e.by, dS[e.by]); }
       if (delay) await wait(delay);
     }
@@ -197,7 +199,7 @@ async function main() {
     audio.sfx(won === false ? 'lose' : 'win');
     const t = w === 'draw' ? { text: 'The seeds are shared exactly — a rare, perfectly even harvest. A draw.' } : rand(won ? world.teachings.win : world.teachings.lose);
     const ov = $('#win'); ov.querySelector('#winTitle').textContent = w === 'draw' ? 'A draw' : `${pname(w)} gathers the most`;
-    ov.querySelector('#winText').textContent = t.text; ov.classList.add('show'); grand.victoryShower(); audio.narrate(t.text, world);
+    ov.querySelector('#winText').textContent = t.text; ov.classList.add('show'); grand.victoryShower(); settingsApi?.haptic('win'); audio.narrate(t.text, world);
   }
   function updateHud() {
     $('#store0').textContent = state.stores[0]; $('#store1').textContent = state.stores[1];
@@ -217,11 +219,17 @@ async function main() {
     { icon: '🔗', title: 'The relay', text: 'When your handful runs out, the next pit is scooped up and sowing continues — it stops when the next pit is empty.' },
     { icon: '🏆', title: 'Win', text: 'When a player has no seeds to sow, each banks their own row. Most seeds wins. Tap 💡 Hint for the best pit.' },
   ] });
+  settingsApi = initSettings({
+    id: 'am',
+    accent: T.accent,
+    onChange: (settings) => applySettings(settings, { bloomPass: bloom, grand, audio }),
+  });
   window.__am = {
     get state() { return state; }, get busy() { return busy; }, world,
     setFast(v) { fast = v; },
     async autoplay(maxTurns = 120) { fast = true; let n = 0; while (state.winner === null && n < maxTurns) { n++; while (busy) await wait(10); const mv = bestMove(state, 1); if (mv === null) break; await doMove(mv); } fast = false; return { winner: state.winner, stores: state.stores }; },
     rendererInfo: () => renderer.info.render,
+    settingsInfo: () => ({ ...settingsApi.get(), bloomEnabled: bloom.enabled, bloomStrength: bloom.strength, grand: grand.info() }),
   };
 
   playOpening({
@@ -230,7 +238,7 @@ async function main() {
     getView: () => ({ az, pol, dist }),
     setView: (v) => { az = v.az; pol = v.pol; dist = v.dist; },
     place,
-    reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+    reducedMotion: settingsApi.get().reducedMotion || matchMedia('(prefers-reduced-motion: reduce)').matches,
   }).finally(() => {
     document.body.classList.remove('cinematic-opening');
     busy = false;
