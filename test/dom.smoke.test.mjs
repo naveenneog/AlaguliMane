@@ -7,7 +7,7 @@ const read = async (f) => readFile(fileURLToPath(new URL(`../web/${f}`, import.m
 
 test('play.html exposes every id the renderer queries', async () => {
   const d = new JSDOM(await read('play.html')).window.document;
-  for (const id of ['stage', 'title', 'kn', 'status', 'thinking', 'card', 'win', 'winTitle', 'winText', 'winAgain', 'turnLabel', 'turnDot', 'store0', 'store1', 'restart', 'hint', 'hintBtn']) {
+  for (const id of ['stage', 'title', 'kn', 'status', 'thinking', 'card', 'win', 'winTitle', 'winText', 'winAgain', 'turnLabel', 'turnDot', 'store0', 'store1', 'restart', 'hint', 'hintBtn', 'undoBtn']) {
     assert.ok(d.getElementById(id), `#${id} present`);
   }
   for (const sel of ['#card .kind', '#card .en', '#card .m']) assert.ok(d.querySelector(sel), sel);

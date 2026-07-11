@@ -47,6 +47,9 @@
     #hint.show { opacity: 1; }
     #hintBtn { font: inherit; color: #241200; background: linear-gradient(180deg, #f2d777, #e8c24a); border: 0;
       border-radius: 11px; padding: .5rem .9rem; cursor: pointer; min-height: 44px; font-weight: 600; }
+    #undoBtn { font: inherit; color: #f4e7cf; background: rgba(255,255,255,.08); border: 1px solid rgba(244,231,207,.22);
+      border-radius: 11px; padding: .5rem .9rem; min-height: 44px; font-weight: 600; cursor: pointer; }
+    #undoBtn:disabled { opacity: .35; cursor: default; }
     @media (max-width: 520px) { #title { font-size: 1.05rem; } }
     #vignette { position: fixed; inset: 0; z-index: 20; pointer-events: none;
       box-shadow: inset 0 0 min(18vw, 180px) min(5vw, 58px) rgba(0,0,0,.54); }
@@ -99,6 +102,7 @@
     <div class="turn"><span class="dot" id="turnDot"></span><span id="turnLabel">—</span></div>
     <div class="stat">Rival<b id="store1">0</b></div>
     <button id="hintBtn">💡 Hint</button>
+    <button id="undoBtn" title="Take back your last move" disabled>↶ Undo</button>
   </div>
   <div id="hint"></div>
   <div id="win"><div class="box"><h1 id="winTitle"></h1><p id="winText"></p><button id="winAgain">Play again</button></div></div>

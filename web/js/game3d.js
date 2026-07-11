@@ -13,6 +13,7 @@ import { applyEnvironment, addContactShadow, applyRealistic, loadTexture, addTab
 import { initTutorial } from './tutorial.js';
 import { createGrandEffects, playOpening } from './grand.js';
 import { initSettings, applySettings } from './settings.js';
+import { initSave } from './save.js';
 import * as audio from './audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -37,7 +38,7 @@ async function main() {
   const pname = (p) => (p === 0 ? world.sides.p0.name : world.sides.p1.name);
   const controls = (p) => mode === 'hotseat' || p === 0;
 
-  let state = newGame(); let busy = true, fast = false, settingsApi = null;
+  let state = newGame(); let busy = true, fast = false, settingsApi = null, save = null;
 
   const MOBILE = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 760;
   const renderer = new THREE.WebGLRenderer({ antialias: !MOBILE, powerPreference: 'high-performance' });
@@ -146,12 +147,13 @@ async function main() {
 
   // ---- move + animate cascade ----
   async function doMove(start) {
-    if (busy) return; busy = true; clearGlow(); clearHint();
-    const before = state; state = applyMove(before, start);
+    if (busy) return; busy = true; clearGlow(); clearHint(); updateUndo();
+    const before = state; save.record(); state = applyMove(before, start);
     await animateTurn(before, state.events);
     fullRelayout();
     const captured = state.stores[before.turn] - before.stores[before.turn];
     if (captured > 0 && state.winner === null) await reveal('capture', rand(world.teachings.capture));
+    save.persist();
     if (state.winner !== null) { await onWin(); busy = false; return; }
     busy = false; loop();
   }
@@ -183,11 +185,20 @@ async function main() {
   }
 
   // ---- turn loop ----
-  function loop() { if (state.winner !== null) return; updateHud(); if (controls(state.turn)) { highlight(); $('#status').textContent = `${pname(state.turn)}: tap one of your pits to sow`; } else aiTurn(); }
+  function loop() {
+    if (state.winner !== null) return;
+    updateHud();
+    if (controls(state.turn)) {
+      highlight();
+      $('#status').textContent = `${pname(state.turn)}: tap one of your pits to sow`;
+      updateUndo();
+    } else aiTurn();
+  }
   async function aiTurn() {
-    busy = true; $('#thinking').classList.add('show'); await wait(300);
+    busy = true; updateUndo(); $('#thinking').classList.add('show'); await wait(300);
     const mv = bestMove(state, level); $('#thinking').classList.remove('show');
-    if (mv === null) { busy = false; return; }
+    if (mv === null) { busy = false; updateUndo(); return; }
+    busy = false;
     await doMove(mv);
   }
 
@@ -195,6 +206,8 @@ async function main() {
   const card = $('#card');
   async function reveal(kind, t) { if (!t) return; card.querySelector('.kind').textContent = 'Captured'; card.querySelector('.kind').className = 'kind capture'; card.querySelector('.en').textContent = t.en || ''; card.querySelector('.m').textContent = t.text; card.classList.add('show'); audio.narrate(t.text, world); await wait(fast ? 0 : 1700); card.classList.remove('show'); await wait(fast ? 0 : 200); }
   async function onWin() {
+    save?.clear();
+    updateUndo();
     const w = state.winner; const won = w === 'draw' ? null : (mode === 'hotseat' || w === 0);
     audio.sfx(won === false ? 'lose' : 'win');
     const t = w === 'draw' ? { text: 'The seeds are shared exactly — a rare, perfectly even harvest. A draw.' } : rand(won ? world.teachings.win : world.teachings.lose);
@@ -205,13 +218,39 @@ async function main() {
     $('#store0').textContent = state.stores[0]; $('#store1').textContent = state.stores[1];
     $('#turnLabel').textContent = pname(state.turn); $('#turnDot').style.background = state.turn === 0 ? (T.p0color || T.accent) : (T.p1color || T.seed);
   }
+
+  function restoreState(saved) {
+    busy = true; fast = false; clearGlow(); clearHint(); updateUndo();
+    state = saved;
+    fullRelayout();
+    card.classList.remove('show');
+    $('#win').classList.remove('show');
+    $('#thinking').classList.remove('show');
+    busy = false;
+    updateHud();
+    loop();
+    updateUndo();
+  }
+
+  function updateUndo() {
+    const button = $('#undoBtn');
+    if (button) button.disabled = !(save && !busy && state.winner === null && controls(state.turn) && save.canUndo());
+  }
+
+  function doUndo() {
+    if (busy || state.winner !== null || !controls(state.turn) || !save?.canUndo()) return;
+    audio.sfx('step');
+    save.undo();
+    updateUndo();
+  }
   updateHud();
 
   (function frame() { const t = performance.now(); for (const r of glow) r.position.y = 0.08 + Math.sin(t * 0.005 + r.position.x) * 0.03; for (const r of hintRings) { r.rotation.z += 0.05; r.scale.setScalar(1 + Math.sin(t * 0.0016) * 0.12); } grand.update(); composer.render(); requestAnimationFrame(frame); })();
-  $('#restart').addEventListener('click', () => location.reload());
+  $('#restart').addEventListener('click', () => { save?.clear(); location.reload(); });
   addEventListener('pointerdown', () => audio.unlock(worldId), { once: true });
-  $('#winAgain')?.addEventListener('click', () => location.reload());
+  $('#winAgain')?.addEventListener('click', () => { save?.clear(); location.reload(); });
   $('#hintBtn')?.addEventListener('click', showHint);
+  $('#undoBtn')?.addEventListener('click', doUndo);
   initTutorial({ key: 'am.tut.v1', title: 'How to play', accent: T.accent, steps: [
     { icon: '🌱', title: 'Alaguli Mane', text: 'A game of counting, not luck. Two rows of seven pits, six seeds each — gather more seeds than your rival.' },
     { icon: '👆', title: '1 · Sow', text: 'Tap one of your glowing pits. Its seeds are lifted and dropped one per pit, going counter-clockwise.' },
@@ -224,9 +263,16 @@ async function main() {
     accent: T.accent,
     onChange: (settings) => applySettings(settings, { bloomPass: bloom, grand, audio }),
   });
+  save = initSave({
+    id: 'am',
+    serialize: () => state,
+    restore: restoreState,
+    isMyTurn: (saved) => controls(saved.turn),
+  });
   window.__am = {
     get state() { return state; }, get busy() { return busy; }, world,
     setFast(v) { fast = v; },
+    play: (pit) => doMove(pit),
     async autoplay(maxTurns = 120) { fast = true; let n = 0; while (state.winner === null && n < maxTurns) { n++; while (busy) await wait(10); const mv = bestMove(state, 1); if (mv === null) break; await doMove(mv); } fast = false; return { winner: state.winner, stores: state.stores }; },
     rendererInfo: () => renderer.info.render,
     settingsInfo: () => ({ ...settingsApi.get(), bloomEnabled: bloom.enabled, bloomStrength: bloom.strength, grand: grand.info() }),
@@ -242,7 +288,8 @@ async function main() {
   }).finally(() => {
     document.body.classList.remove('cinematic-opening');
     busy = false;
-    loop();
+    if (!(save.hasSaved() && save.resume())) loop();
+    updateUndo();
   });
 }
 main().catch((e) => { console.error(e); const s = document.querySelector('#status'); if (s) s.textContent = 'Error: ' + e.message; });
