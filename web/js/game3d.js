@@ -71,11 +71,11 @@ async function main() {
   const pitPos = (i) => (i <= 6 ? new THREE.Vector3((i - 3) * SP, 0, 1.05 * SP) : new THREE.Vector3((3 - (i - 7)) * SP, 0, -1.05 * SP));
   const storePos = (p) => new THREE.Vector3((p === 0 ? 4.4 : -4.4) * SP, 0, 0);
   const slab = new THREE.Mesh(new THREE.BoxGeometry(10.6 * SP, 0.4, 3.2 * SP), REALISTIC
-    ? new THREE.MeshStandardMaterial({ map: loadTexture('assets/realistic/board.jpg', [3, 1]), roughness: 0.55, metalness: 0.08, envMapIntensity: 1.15 })
+    ? new THREE.MeshStandardMaterial({ map: loadTexture(`assets/${worldId}/board.jpg`, [3, 1]), roughness: 0.55, metalness: 0.08, envMapIntensity: 1.15 })
     : new THREE.MeshStandardMaterial({ color: hexInt(T.board), roughness: 0.6, metalness: 0.28, envMapIntensity: 0.5 }));
   slab.position.y = -0.22; slab.receiveShadow = true; scene.add(slab);
   addContactShadow(scene, 6.2 * SP, -0.04, 0.42);
-  if (REALISTIC) addTableWorld(scene, { radius: 9 * SP, tableY: -0.44, woodUrl: 'assets/realistic/board.jpg', floorHex: hexInt(T.bg) });
+  if (REALISTIC) addTableWorld(scene, { radius: 9 * SP, tableY: -0.44, woodUrl: `assets/${worldId}/board.jpg`, floorHex: hexInt(T.bg) });
   const rimMat = new THREE.MeshStandardMaterial(REALISTIC ? { color: hexInt(T.accent), emissive: 0x000000, roughness: 0.4, metalness: 0.85, envMapIntensity: 1.2 } : { color: hexInt(T.accent), emissive: hexInt(T.accent), emissiveIntensity: 0.35, roughness: 0.35, metalness: 0.5, envMapIntensity: 0.9 });
   const wellMat = new THREE.MeshStandardMaterial(REALISTIC ? { color: hexInt(T.pit), roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 } : { color: hexInt(T.pit), roughness: 0.7, metalness: 0.15, envMapIntensity: 0.4 });
   const pitGroups = [], pitFlash = [];

@@ -5,6 +5,7 @@
   "subtitle": "a modern reading",
   "intent": "Cash flow is strategy: move small amounts through your accounts and bank them the moment they group into a matured four.",
   "era": "modern",
+  "realistic": true,
   "theme": { "bg": "#08130f", "board": "#123028", "pit": "#0c1f19", "seed": "#4bd6a0", "accent": "#4bd6c2", "text": "#e7f5ef", "fog": "#08130f", "p0color": "#4bd6a0", "p1color": "#ffd24a" },
   "sides": { "p0": { "name": "Householder", "en": "The saver" }, "p1": { "name": "Trader", "en": "The dealer" } },
   "voice": { "web": "en-IN", "azure": "en-IN-Neerja:DragonHDLatestNeural" },

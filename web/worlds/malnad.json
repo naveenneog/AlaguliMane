@@ -5,6 +5,7 @@
   "subtitle": "the original counting game",
   "intent": "Counting is the strategy: watch for fours, chain the sowing, and gather the larger harvest.",
   "era": "original",
+  "realistic": true,
   "theme": { "bg": "#160f06", "board": "#4a2e14", "pit": "#28190c", "seed": "#e8a24a", "accent": "#e8c24a", "text": "#f4e7cf", "fog": "#160f06", "p0color": "#e8a24a", "p1color": "#f0e0c0" },
   "sides": { "p0": { "name": "Hunase", "en": "Tamarind seeds" }, "p1": { "name": "Kavade", "en": "Cowrie seeds" } },
   "voice": { "web": "en-IN", "azure": "en-IN-Arjun:DragonHDLatestNeural" },
