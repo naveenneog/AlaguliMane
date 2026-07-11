@@ -14,6 +14,7 @@ import { initTutorial } from './tutorial.js';
 import { createGrandEffects, playOpening } from './grand.js';
 import { initSettings, applySettings } from './settings.js';
 import { initSave } from './save.js';
+import { createCoachOverlay } from './coach3d.js';
 import * as audio from './audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -124,6 +125,7 @@ async function main() {
   function place() { pol = Math.max(0.12, Math.min(1.2, pol)); dist = Math.max(radius * 0.7, Math.min(radius * 3, dist)); camera.position.set(dist * Math.sin(pol) * Math.sin(az), dist * Math.cos(pol), tv.z + dist * Math.sin(pol) * Math.cos(az)); camera.lookAt(tv); }
   place();
   const grand = createGrandEffects({ scene, boardRadius: radius, accent: hexInt(T.accent), realistic: REALISTIC, mobile: MOBILE });
+  const coach = createCoachOverlay({ scene });
   const canvas = renderer.domElement; const ptrs = new Map(); let dragged = false, pinchD = 0;
   canvas.addEventListener('pointerdown', (e) => { ptrs.set(e.pointerId, e); dragged = false; canvas.setPointerCapture(e.pointerId); });
   canvas.addEventListener('pointermove', (e) => { if (!ptrs.has(e.pointerId)) return; const prev = ptrs.get(e.pointerId); ptrs.set(e.pointerId, e);
@@ -172,15 +174,39 @@ async function main() {
   function flashPit(i) { const g = pitGroups[i]; const rim = g.children[0]; const old = rim.material; const flash = new THREE.MeshStandardMaterial({ color: 0xffd24a, emissive: 0xffd24a, emissiveIntensity: 1.8 }); rim.material = flash; setTimeout(() => { rim.material = old; }, fast ? 0 : 320); }
 
   // ---- hint engine ----
-  const hintRings = []; let hintTimer = null;
-  function clearHint() { for (const r of hintRings) scene.remove(r); hintRings.length = 0; const h = $('#hint'); if (h) h.classList.remove('show'); if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; } }
-  function addHintRing(pit) { const r = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.06, 12, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.8 })); r.rotation.x = Math.PI / 2; r.position.copy(pitPos(pit)); r.position.y = 0.1; scene.add(r); hintRings.push(r); }
+  let hintTimer = null;
+  function clearHint() { coach.clear(); const h = $('#hint'); if (h) h.classList.remove('show'); if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; } }
+  function previewSow(start, next) {
+    coach.destination(pitPos(start), { radius: 0.52 });
+    const routeEvents = next.events.filter((event) => event.type === 'pickup' || event.type === 'sow').slice(0, PITS + 6);
+    coach.path([pitPos(start), ...routeEvents.map((event) => pitPos(event.pit))], { y: 0.21 });
+
+    const drops = new Map();
+    for (const event of next.events) if (event.type === 'sow') drops.set(event.pit, (drops.get(event.pit) || 0) + 1);
+    const ghostSeeds = [];
+    for (const [pit, count] of drops) {
+      const base = pitPos(pit);
+      const slots = seedSlots(Math.min(count, 4), 0.28);
+      slots.forEach(([x, z], i) => ghostSeeds.push(new THREE.Vector3(base.x + x, 0.18 + i * 0.012, base.z + z)));
+    }
+    coach.ghosts(ghostSeeds, { role: 'path', radius: 0.075, max: 48 });
+
+    const captures = next.events.filter((event) => event.type === 'capture4' || event.type === 'captureEnd');
+    for (const event of captures) {
+      const base = pitPos(event.pit);
+      coach.danger(base, { radius: 0.48 });
+      const count = event.type === 'capture4' ? 4 : Math.min(event.count || 4, 4);
+      const redSeeds = seedSlots(count, 0.3).map(([x, z], i) => new THREE.Vector3(base.x + x, 0.23 + i * 0.012, base.z + z));
+      coach.ghosts(redSeeds, { role: 'danger', radius: 0.085, max: 4 });
+    }
+    if (next.stores[state.turn] > state.stores[state.turn]) coach.destination(storePos(state.turn), { radius: 0.68, y: 0.18 });
+  }
   function showHint() {
     if (busy || state.winner !== null || !controls(state.turn)) return;
     const mv = bestMove(state, Math.max(2, level)); if (mv === null) return; clearHint();
     const ns = applyMove(state, mv); const gained = ns.stores[state.turn] - state.stores[state.turn];
     const txt = gained > 0 ? `Sow the glowing pit — this move gathers ${gained} seed${gained > 1 ? 's' : ''} for you.` : 'Sow the glowing pit — it keeps seeds on your side and sets up future fours.';
-    addHintRing(mv);
+    previewSow(mv, ns);
     const h = $('#hint'); if (h) { h.textContent = '💡 ' + txt; h.classList.add('show'); } hintTimer = setTimeout(clearHint, 5200);
   }
 
@@ -245,7 +271,7 @@ async function main() {
   }
   updateHud();
 
-  (function frame() { const t = performance.now(); for (const r of glow) r.position.y = 0.08 + Math.sin(t * 0.005 + r.position.x) * 0.03; for (const r of hintRings) { r.rotation.z += 0.05; r.scale.setScalar(1 + Math.sin(t * 0.0016) * 0.12); } grand.update(); composer.render(); requestAnimationFrame(frame); })();
+  (function frame() { const t = performance.now(); for (const r of glow) r.position.y = 0.08 + Math.sin(t * 0.005 + r.position.x) * 0.03; coach.update(); grand.update(); composer.render(); requestAnimationFrame(frame); })();
   $('#restart').addEventListener('click', () => { save?.clear(); location.reload(); });
   addEventListener('pointerdown', () => audio.unlock(worldId), { once: true });
   $('#winAgain')?.addEventListener('click', () => { save?.clear(); location.reload(); });
@@ -261,7 +287,10 @@ async function main() {
   settingsApi = initSettings({
     id: 'am',
     accent: T.accent,
-    onChange: (settings) => applySettings(settings, { bloomPass: bloom, grand, audio }),
+    onChange: (settings) => {
+      applySettings(settings, { bloomPass: bloom, grand, audio });
+      coach.setPreferences(settings);
+    },
   });
   save = initSave({
     id: 'am',
@@ -275,7 +304,7 @@ async function main() {
     play: (pit) => doMove(pit),
     async autoplay(maxTurns = 120) { fast = true; let n = 0; while (state.winner === null && n < maxTurns) { n++; while (busy) await wait(10); const mv = bestMove(state, 1); if (mv === null) break; await doMove(mv); } fast = false; return { winner: state.winner, stores: state.stores }; },
     rendererInfo: () => renderer.info.render,
-    settingsInfo: () => ({ ...settingsApi.get(), bloomEnabled: bloom.enabled, bloomStrength: bloom.strength, grand: grand.info() }),
+    settingsInfo: () => ({ ...settingsApi.get(), bloomEnabled: bloom.enabled, bloomStrength: bloom.strength, grand: grand.info(), coach: coach.info() }),
   };
 
   playOpening({
