@@ -16,6 +16,7 @@ import { initSettings, applySettings } from './settings.js';
 import { initSave } from './save.js';
 import { createCoachOverlay } from './coach3d.js';
 import { initLearn } from './learn.js';
+import { setLang as i18nSetLang, savedLang, loadWorldI18n, t as tr } from './i18n.js';
 import * as audio from './audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -30,6 +31,7 @@ async function main() {
   let cfg = {}; try { cfg = JSON.parse(sessionStorage.getItem('am.game') || '{}'); } catch { cfg = {}; }
   const worldId = (params.get('world') || cfg.world || 'parampare').replace(/[^a-z]/gi, '');
   const world = await (await fetch(`worlds/${worldId}.json`)).json();
+  const uiLang = savedLang('am'); i18nSetLang(uiLang); audio.setLang(uiLang); await loadWorldI18n(worldId);
   const T = world.theme || {};
   const REALISTIC = !!world.realistic;
   const mode = params.get('mode') || cfg.mode || 'ai';
@@ -237,7 +239,7 @@ async function main() {
 
   // ---- reveal + win + hud ----
   const card = $('#card');
-  async function reveal(kind, t) { if (!t) return; card.querySelector('.kind').textContent = 'Captured'; card.querySelector('.kind').className = 'kind capture'; card.querySelector('.en').textContent = t.en || ''; card.querySelector('.m').textContent = t.text; card.classList.add('show'); audio.narrate(t.text, world); await wait(fast ? 0 : 1700); card.classList.remove('show'); await wait(fast ? 0 : 200); }
+  async function reveal(kind, t) { if (!t) return; card.querySelector('.kind').textContent = 'Captured'; card.querySelector('.kind').className = 'kind capture'; card.querySelector('.en').textContent = t.en || ''; card.querySelector('.m').textContent = tr(t.text); card.classList.add('show'); audio.narrate(t.text, world); await wait(fast ? 0 : 1700); card.classList.remove('show'); await wait(fast ? 0 : 200); }
   async function onWin() {
     save?.clear();
     updateUndo();
@@ -245,7 +247,7 @@ async function main() {
     audio.sfx(won === false ? 'lose' : 'win');
     const t = w === 'draw' ? { text: 'The seeds are shared exactly — a rare, perfectly even harvest. A draw.' } : rand(won ? world.teachings.win : world.teachings.lose);
     const ov = $('#win'); ov.querySelector('#winTitle').textContent = w === 'draw' ? 'A draw' : `${pname(w)} gathers the most`;
-    ov.querySelector('#winText').textContent = t.text; ov.classList.add('show'); grand.victoryShower(); settingsApi?.haptic('win'); audio.narrate(t.text, world);
+    ov.querySelector('#winText').textContent = tr(t.text); ov.classList.add('show'); grand.victoryShower(); settingsApi?.haptic('win'); audio.narrate(t.text, world);
   }
   function updateHud() {
     $('#store0').textContent = state.stores[0]; $('#store1').textContent = state.stores[1];
