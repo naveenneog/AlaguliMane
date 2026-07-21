@@ -1,0 +1,20 @@
+{
+  "am.achievement.first-match.title": "First Sowing",
+  "am.achievement.first-match.desc": "Complete your first match on the Alaguli Mane board.",
+  "am.achievement.first-win.title": "A Full Granary",
+  "am.achievement.first-win.desc": "Win your first match as the local player.",
+  "am.achievement.six-puzzles.title": "Pattern Keeper",
+  "am.achievement.six-puzzles.desc": "Solve all six Alaguli Mane puzzles.",
+  "am.achievement.first-daily.title": "Morning Lamp",
+  "am.achievement.first-daily.desc": "Complete a daily challenge.",
+  "am.achievement.steady-rhythm.title": "Steady Rhythm",
+  "am.achievement.steady-rhythm.desc": "Build a best daily rhythm of three days.",
+  "am.achievement.generous-harvest.title": "Generous Harvest",
+  "am.achievement.generous-harvest.desc": "Gather at least twelve seeds through captures in one sow.",
+  "am.achievement.three-captures.title": "Three Baskets",
+  "am.achievement.three-captures.desc": "Trigger three capture events during one sow.",
+  "am.achievement.long-relay.title": "The Long Relay",
+  "am.achievement.long-relay.desc": "Lift and continue from at least three pits during one turn.",
+  "am.achievement.turning-tide.title": "Turning Tide",
+  "am.achievement.turning-tide.desc": "Recover the lead during the match and carry it to victory."
+}

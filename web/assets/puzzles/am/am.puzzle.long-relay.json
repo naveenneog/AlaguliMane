@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "am.puzzle.long-relay",
+  "game": "am",
+  "world": "parampare",
+  "engine": {
+    "version": "am-engine-v1"
+  },
+  "ruleset": {
+    "id": "am.base",
+    "version": 1
+  },
+  "rng": {
+    "algorithm": "xoshiro128ss-v1",
+    "seed": "am.puzzle.long-relay.v1"
+  },
+  "titleKey": "am.puzzle.long-relay.title",
+  "briefKey": "am.puzzle.long-relay.brief",
+  "hintKeys": [
+    "am.puzzle.long-relay.hint.1"
+  ],
+  "difficulty": "medium",
+  "position": {
+    "kind": "state",
+    "state": {
+      "pits": [
+        0,
+        0,
+        7,
+        7,
+        7,
+        7,
+        7,
+        0,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "stores": [
+        7,
+        0
+      ],
+      "turn": 1,
+      "winner": null,
+      "events": []
+    },
+    "stateHash": "6600c1fc5d3aebbb"
+  },
+  "goal": {
+    "type": "atLeast",
+    "path": "stores.1",
+    "n": 25
+  },
+  "constraints": {
+    "maxActions": 1,
+    "allowUndo": true
+  },
+  "solution": [
+    {
+      "type": "sow",
+      "pit": 10
+    }
+  ],
+  "par": 1
+}

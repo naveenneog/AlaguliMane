@@ -1,0 +1,401 @@
+{
+  "format": "tbg-language-pack",
+  "schema": 1,
+  "game": "am",
+  "language": "mr",
+  "version": "1.8.0-alpha.1",
+  "contentVersion": 1,
+  "component": "voice",
+  "fallbackLanguage": null,
+  "bytes": 1565839,
+  "sha256": "ddd8a25acdaa8ceb5d6673794be34511da5f1ba2eee980aeee218c78de96c1ea",
+  "files": [
+    {
+      "path": "packs/am/mr/1/voices.json",
+      "role": "voice-manifest",
+      "mediaType": "application/json",
+      "bytes": 7077,
+      "sha256": "10ae7119fd3e598fa7a40cfd0e75fb9f40f3797615bcaafa78db82cf3d4e77b8"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.ba42bcaeb2e07b6d1b8a7116177322a07302671e1fa33f74a5152ecf04c48732.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 34644,
+      "sha256": "ca1c8191522e5d7b876cf5a993105905e8330488c8f4021cf7a3c8465286a38d",
+      "contentId": "voice.malnad.ba42bcaeb2e07b6d1b8a7116177322a07302671e1fa33f74a5152ecf04c48732",
+      "durationMs": 9480,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.9c1b842e4aaa28f245564fbc9d86e8f709a76cc790619cf5142650183fc67dc8.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 74426,
+      "sha256": "9ceb4e44fc769a620afdb92867363ebbbc29d9ef881e37f57994a7293f5d9f77",
+      "contentId": "voice.malnad.9c1b842e4aaa28f245564fbc9d86e8f709a76cc790619cf5142650183fc67dc8",
+      "durationMs": 20616,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.72933a2d62c50a6b4076e87b2f8ce8a57b82df1a125bf1ce96be8a9b70e15dad.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 33136,
+      "sha256": "963e5335766f8d1ae596809469c7b3487698c5a85b9be2c01b42436168f13f83",
+      "contentId": "voice.malnad.72933a2d62c50a6b4076e87b2f8ce8a57b82df1a125bf1ce96be8a9b70e15dad",
+      "durationMs": 9576,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.de197a7a51637e3e660976f1e85c6839c76145274c711fc43eed8c9a85d70774.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 42539,
+      "sha256": "46b4332db753a918da82d7390cead52b95ccdf96709deb61606740b86656b3b1",
+      "contentId": "voice.malnad.de197a7a51637e3e660976f1e85c6839c76145274c711fc43eed8c9a85d70774",
+      "durationMs": 11904,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.cf7b647e5cbc613182fd6fb158f0730414f0187e5757328ff20ea18f620f39bf.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 37035,
+      "sha256": "44ed873831caa685d94a50be610070100ef6eea59130483a101b63d0f6f54d2c",
+      "contentId": "voice.malnad.cf7b647e5cbc613182fd6fb158f0730414f0187e5757328ff20ea18f620f39bf",
+      "durationMs": 10056,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.36d0228105b4754750fa000d3244662644582d907c5ebed844cdbb7ee9c66b19.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 42675,
+      "sha256": "b3a8acaef172c209cec1e3ea97e6cf4c2c066623d112e8b7e4e8d8630684795d",
+      "contentId": "voice.malnad.36d0228105b4754750fa000d3244662644582d907c5ebed844cdbb7ee9c66b19",
+      "durationMs": 11544,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.01b8edba4f16271f38c16e4c17263732bcfccdc2e745aa4435a804cac1d8d726.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 40796,
+      "sha256": "85835e7899959b9d1f8cb1bc516d738a63b3ed37c1a48a8c093fc98c053f8589",
+      "contentId": "voice.malnad.01b8edba4f16271f38c16e4c17263732bcfccdc2e745aa4435a804cac1d8d726",
+      "durationMs": 11376,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.malnad.f0ebedbb43673872cafe4683f79bd1f9e052f6f52473b1304523975f85133c9b.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 38772,
+      "sha256": "e4cfa61ca4316d8b394e3b422820e7bb4715b9c0095a1bf9eb42a4c587473b08",
+      "contentId": "voice.malnad.f0ebedbb43673872cafe4683f79bd1f9e052f6f52473b1304523975f85133c9b",
+      "durationMs": 10848,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.ba42bcaeb2e07b6d1b8a7116177322a07302671e1fa33f74a5152ecf04c48732.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 34755,
+      "sha256": "270905115744b335bdd5f4fafb91edc93f40c859142c9f21dab39e25d515d524",
+      "contentId": "voice.parampare.ba42bcaeb2e07b6d1b8a7116177322a07302671e1fa33f74a5152ecf04c48732",
+      "durationMs": 9528,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.9c1b842e4aaa28f245564fbc9d86e8f709a76cc790619cf5142650183fc67dc8.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 71634,
+      "sha256": "7726984e3f511c6c662f2b5463cf0507a9c0d4fd996f578a35872a196f5bb36a",
+      "contentId": "voice.parampare.9c1b842e4aaa28f245564fbc9d86e8f709a76cc790619cf5142650183fc67dc8",
+      "durationMs": 19872,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.72933a2d62c50a6b4076e87b2f8ce8a57b82df1a125bf1ce96be8a9b70e15dad.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 33136,
+      "sha256": "ced47d80bc11a1c6b69e6d3ed071746edfa27f411e830199352c2167455a1363",
+      "contentId": "voice.parampare.72933a2d62c50a6b4076e87b2f8ce8a57b82df1a125bf1ce96be8a9b70e15dad",
+      "durationMs": 9576,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.de197a7a51637e3e660976f1e85c6839c76145274c711fc43eed8c9a85d70774.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 43373,
+      "sha256": "a9e3deffce43594950fb8443bea0ed3a79eac9e5192f407d48d3f3524bc34b14",
+      "contentId": "voice.parampare.de197a7a51637e3e660976f1e85c6839c76145274c711fc43eed8c9a85d70774",
+      "durationMs": 12144,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.cf7b647e5cbc613182fd6fb158f0730414f0187e5757328ff20ea18f620f39bf.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 37595,
+      "sha256": "8a99b00f09512438c0207a2cbd07d0db2a9799b22f8f972db103d64fb97d5ce5",
+      "contentId": "voice.parampare.cf7b647e5cbc613182fd6fb158f0730414f0187e5757328ff20ea18f620f39bf",
+      "durationMs": 10296,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.36d0228105b4754750fa000d3244662644582d907c5ebed844cdbb7ee9c66b19.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 41701,
+      "sha256": "a726c001901957af524fa59929f968b9301fe18af5b2baabbdb97ea2b1aa84f8",
+      "contentId": "voice.parampare.36d0228105b4754750fa000d3244662644582d907c5ebed844cdbb7ee9c66b19",
+      "durationMs": 11352,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.01b8edba4f16271f38c16e4c17263732bcfccdc2e745aa4435a804cac1d8d726.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 36505,
+      "sha256": "5fb0e36b4cc2ba316a0bd398a8c0d3f7b69af37f0006b53282c41f5e7ac89575",
+      "contentId": "voice.parampare.01b8edba4f16271f38c16e4c17263732bcfccdc2e745aa4435a804cac1d8d726",
+      "durationMs": 10200,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.parampare.f0ebedbb43673872cafe4683f79bd1f9e052f6f52473b1304523975f85133c9b.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 38844,
+      "sha256": "e1f27b5b68720d36cd800f000cd5daf1136f8e972f56ce310fce80db4bbaa80f",
+      "contentId": "voice.parampare.f0ebedbb43673872cafe4683f79bd1f9e052f6f52473b1304523975f85133c9b",
+      "durationMs": 10944,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.5575de75fa1499f342c873ac330681346e774744f49aa890809b65d0dd61c8f4.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 45988,
+      "sha256": "9c2afbadb86aa24fd4ec1ebeac3b97861decf0879708c3435133a286901fc218",
+      "contentId": "voice.suggi.5575de75fa1499f342c873ac330681346e774744f49aa890809b65d0dd61c8f4",
+      "durationMs": 12384,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.c1d9f3bfe5fbca0ee0eb360fae49885f5d4ed774e9fe09e5879c79f21dc444a9.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 54409,
+      "sha256": "518d7fab418956beabf302bcee366f054dde1f3b04251e3ec9da70b21e6b3c32",
+      "contentId": "voice.suggi.c1d9f3bfe5fbca0ee0eb360fae49885f5d4ed774e9fe09e5879c79f21dc444a9",
+      "durationMs": 15024,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.63ac7b383683fb0f4c15815a8195b5db1fff5a7fb97dec57f5c124a5658202e4.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 45139,
+      "sha256": "b99df570ef80e012d27f21cc722e16b2604c8f74edfce6cd683d543f9d157ccf",
+      "contentId": "voice.suggi.63ac7b383683fb0f4c15815a8195b5db1fff5a7fb97dec57f5c124a5658202e4",
+      "durationMs": 11736,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.4116b9bab6b970a48581ee46b6db6afc4f358db603c208bf13ea420f33724250.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 39330,
+      "sha256": "e0d4b584c39f8137387e5f73a9484c8a6d024248ea40d7b5b21b5ccb686b99bb",
+      "contentId": "voice.suggi.4116b9bab6b970a48581ee46b6db6afc4f358db603c208bf13ea420f33724250",
+      "durationMs": 11088,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.d7dca707acd3fff6351f7f388d158b4beccac415333de532fe31b9e8da5ec2b5.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 36096,
+      "sha256": "a7e3a31d04ab4df2bea05413ede0f1cf3a9039313d1ededf69ea2a35a51bb32e",
+      "contentId": "voice.suggi.d7dca707acd3fff6351f7f388d158b4beccac415333de532fe31b9e8da5ec2b5",
+      "durationMs": 10224,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.12031aa6e473f450ecbd1b9a83f3f8ae65c7292772795a370afddc99a1795747.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 35621,
+      "sha256": "6826e0cce511638209e043e7453a1ff1522b24731060f5d54a03319bb36f8e21",
+      "contentId": "voice.suggi.12031aa6e473f450ecbd1b9a83f3f8ae65c7292772795a370afddc99a1795747",
+      "durationMs": 10200,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.8e9fa4065cb52700791804a13179fadfc05826335eddb1d3b76ac27b07ffdbe2.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 39796,
+      "sha256": "caa15cddb0624f99fc452d5c6b6745ae0992662ff9168a726e4f48142f06aa8b",
+      "contentId": "voice.suggi.8e9fa4065cb52700791804a13179fadfc05826335eddb1d3b76ac27b07ffdbe2",
+      "durationMs": 11232,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.suggi.97fada99aec1da3b101b90dae95a6bc134a117eb5150293462ed9fb298e1fd26.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 41917,
+      "sha256": "70df399db3ee4f55abf6ae0338f251a6c330e8afbf72af87272c994b464c256b",
+      "contentId": "voice.suggi.97fada99aec1da3b101b90dae95a6bc134a117eb5150293462ed9fb298e1fd26",
+      "durationMs": 11664,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ui.4cee0851053bf44c5fbf887d4d866b67140e53074940b33897778ecfdaeb7cd2.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 34111,
+      "sha256": "10e86c2365928056debe7a23fbc55a773d3c5bbe98d5ed576870df555e5fa513",
+      "contentId": "voice.ui.4cee0851053bf44c5fbf887d4d866b67140e53074940b33897778ecfdaeb7cd2",
+      "durationMs": 9720,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ui.4b5b69d5a8316af62ee252011a6cf20c32067a37b9d7c836e00187fcc31a169f.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 25019,
+      "sha256": "50ec1d3bf04df0aee056e57f0e985017bbb3a5a1de01b3e35b509f7143e25cb1",
+      "contentId": "voice.ui.4b5b69d5a8316af62ee252011a6cf20c32067a37b9d7c836e00187fcc31a169f",
+      "durationMs": 6984,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ui.19a6b1530aef3358b3bec2ae81ac199238e353e1f15c4a8cc76b3460ea49d6bc.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 46782,
+      "sha256": "e9050cec41fe52e6fd0b09eabfd31b439aa15643e55b1a0b108698338f25b6b6",
+      "contentId": "voice.ui.19a6b1530aef3358b3bec2ae81ac199238e353e1f15c4a8cc76b3460ea49d6bc",
+      "durationMs": 12576,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ui.b32d1680a5c22a0d443139aab10f96a2d0f47bae46625a745ed403a5ab6331c0.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 36703,
+      "sha256": "3960ca988d820f086762f314dabe2b8bf4cce61df43426a7eae33e44c052c844",
+      "contentId": "voice.ui.b32d1680a5c22a0d443139aab10f96a2d0f47bae46625a745ed403a5ab6331c0",
+      "durationMs": 10128,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ui.9c78b7f1ab1881ac1348057d7f0059c4dc50b6be31c3cc643483f91b2db95928.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 33582,
+      "sha256": "4e1b1eb4476c6c726576976cd7d24b12d84ab358a7764de63944c32c19827448",
+      "contentId": "voice.ui.9c78b7f1ab1881ac1348057d7f0059c4dc50b6be31c3cc643483f91b2db95928",
+      "durationMs": 9504,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ui.ea19267f16f266ccb8ad7e2def2d2a3719c9c289dfdb11d386059f0e850bddcd.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 36218,
+      "sha256": "ab6e95819f222187ab05861e29b81132ed1744ed753bf20347847ab3b0f486f2",
+      "contentId": "voice.ui.ea19267f16f266ccb8ad7e2def2d2a3719c9c289dfdb11d386059f0e850bddcd",
+      "durationMs": 10272,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.597de016f22cbc2174f14bec2dace08af7ec5bb875bfe4cf566aa0d4dd779774.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 41917,
+      "sha256": "b3c854e7acb067b3ad77b118a91083b4c5df6770e3a814ba2469d019477a4191",
+      "contentId": "voice.ulita.597de016f22cbc2174f14bec2dace08af7ec5bb875bfe4cf566aa0d4dd779774",
+      "durationMs": 11280,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.9d2067be1dc520eca5b1582a9500015adfaa7d8978916311bb69dd602c9d0daf.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 62255,
+      "sha256": "f444ee8eef7fff3627f9002fdc52ebf4f295b0000f982b6345235fcefa5a5aab",
+      "contentId": "voice.ulita.9d2067be1dc520eca5b1582a9500015adfaa7d8978916311bb69dd602c9d0daf",
+      "durationMs": 17304,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.01b4f9d58586837dd9c15d3b003860342fbd3939947571902c4ddd42bd22fc46.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 33097,
+      "sha256": "8b3b57afb1775aad4d9483fa897c9866239440ad3862e52248da07e574bb4289",
+      "contentId": "voice.ulita.01b4f9d58586837dd9c15d3b003860342fbd3939947571902c4ddd42bd22fc46",
+      "durationMs": 9024,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.8d5e409b4d4675be92f56765fadc9b891ff5cd2c8f32f2fa8ed079e4cff6d26b.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 38944,
+      "sha256": "e5966caf89af367417af4045a078c0da0c4023546e2ad70244387d6f819af084",
+      "contentId": "voice.ulita.8d5e409b4d4675be92f56765fadc9b891ff5cd2c8f32f2fa8ed079e4cff6d26b",
+      "durationMs": 10992,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.ed308b2cc2b8f275313c56842b1dec78a28282bc5522dfb8a4bb913540364273.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 38778,
+      "sha256": "6f980bfcc9420cbe29a3149bfe40a9f300cf23de57bd9153ed034738f1f43de1",
+      "contentId": "voice.ulita.ed308b2cc2b8f275313c56842b1dec78a28282bc5522dfb8a4bb913540364273",
+      "durationMs": 10992,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.67446df54f53f06b31049a8783eed7ddc995f510fa39d21f2027d39ade735f1b.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 39811,
+      "sha256": "5d7e2b568e7c69f7b2d0cc629f0a44fb0b2104d2d75488fc48a44ee2807cc0bc",
+      "contentId": "voice.ulita.67446df54f53f06b31049a8783eed7ddc995f510fa39d21f2027d39ade735f1b",
+      "durationMs": 11112,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.c3df715d2715acb7a2b7244feac45a561943ed7a485b772bbe2b3afd411899e9.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 37981,
+      "sha256": "e0ed4732a29f15af17d41401714995bd8fabd75bec1bb85f209371762eb3de1f",
+      "contentId": "voice.ulita.c3df715d2715acb7a2b7244feac45a561943ed7a485b772bbe2b3afd411899e9",
+      "durationMs": 10680,
+      "voiceId": "mr-IN-AarohiNeural"
+    },
+    {
+      "path": "packs/am/mr/1/voice/voice.ulita.f63233d36590b04c842a7d18202bfdb95849cba886485745f474a671de36122f.ogg",
+      "role": "voice",
+      "mediaType": "audio/ogg",
+      "bytes": 33702,
+      "sha256": "7f43a362f617371d04c3ee0418dad9e4cd4b892d7d7e0a7fb780129b8c8cc42d",
+      "contentId": "voice.ulita.f63233d36590b04c842a7d18202bfdb95849cba886485745f474a671de36122f",
+      "durationMs": 9648,
+      "voiceId": "mr-IN-AarohiNeural"
+    }
+  ]
+}

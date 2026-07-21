@@ -20,23 +20,19 @@
       <img class="hero-img" src="assets/brand/hero.png" alt="Alaguli Mane — the sowing game" />
       <div class="kn">ಆಳಗುಳಿ ಮನೆ</div>
       <h1>Alaguli Mane</h1>
-      <p>The ancient sowing-and-counting game — Pallanguzhi — reborn in glowing 3D. Sow the seeds around
-        fourteen pits, chain the relays, and capture every four. <b>No dice. Only counting.</b></p>
+      <p><span data-i18n>The ancient sowing-and-counting game — Pallanguzhi — reborn in glowing 3D. Sow the seeds around fourteen pits, chain the relays, and capture every four.</span> <b data-i18n>No dice. Only counting.</b></p>
       <div class="cta">
-        <a class="primary" href="setup.html">Play now →</a>
-        <a class="ghost" href="https://github.com/naveenneog/AlaguliMane/releases/latest/download/AlaguliMane.apk">Android APK</a>
+        <a class="primary" href="setup.html" data-i18n>Play now →</a>
+        <a class="ghost" href="https://github.com/naveenneog/AlaguliMane/releases/latest/download/AlaguliMane.apk" data-i18n>Android APK</a>
       </div>
     </div>
     <div class="feat">
-      <div class="f"><b>Counting made visible</b><p>Every pit shows its seed count and the sowing plays out
-        seed by seed — the game was a teaching tool for arithmetic, and the rebuild honours that.</p></div>
-      <div class="f"><b>Three worlds, one board</b><p>The <i>Malnad</i> home board, a modern <i>Ulita</i> savings
-        reading, and the <i>Suggi</i> harvest tale — each re-reads counting as maths, money, or patience.</p></div>
-      <div class="f"><b>Glowing 3D &amp; a sharp AI</b><p>Bloom-lit seeds in carved bowls, mobile-first touch, and a
-        minimax opponent that plans the fours several moves ahead.</p></div>
+      <div class="f"><b data-i18n>Counting made visible</b><p data-i18n>Every pit shows its seed count and the sowing plays out seed by seed — the game was a teaching tool for arithmetic, and the rebuild honours that.</p></div>
+      <div class="f"><b data-i18n>Three worlds, one board</b><p data-i18n>The <i>Malnad</i> home board, a modern <i>Ulita</i> savings reading, and the <i>Suggi</i> harvest tale — each re-reads counting as maths, money, or patience.</p></div>
+      <div class="f"><b data-i18n>Glowing 3D &amp; a sharp AI</b><p data-i18n>Bloom-lit seeds in carved bowls, mobile-first touch, and a minimax opponent that plans the fours several moves ahead.</p></div>
     </div>
-    <p class="foot">Part of <a href="../index.html">Traditional Board Games</a> · reconstructed with original intent ·
-      built with GitHub Copilot CLI</p>
+    <p class="foot"><span data-i18n>Part of</span> <a href="../index.html" data-i18n>Traditional Board Games</a> ·
+      <span data-i18n>reconstructed with original intent</span> · <span data-i18n>built with GitHub Copilot CLI</span></p>
   </div>
   <script>
     (function () { var img = document.querySelector('.hero-img'); if (!img) return;
@@ -44,6 +40,15 @@
         var v = document.createElement('video'); v.className = 'hero-img'; v.src = 'assets/brand/intro.mp4';
         v.poster = img.getAttribute('src'); v.autoplay = v.loop = v.muted = v.playsInline = true;
         v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); img.replaceWith(v); }).catch(function () {}); })();
+  </script>
+  <script type="module">
+    import { setLang, savedLang, loadUII18n, localizeUI, t } from './js/i18n.js';
+    const lang = savedLang('am');
+    setLang(lang);
+    document.documentElement.lang = lang;
+    await loadUII18n('am');
+    localizeUI();
+    document.title = t('Alaguli Mane — the sowing game, reborn in 3D');
   </script>
 </body>
 </html>

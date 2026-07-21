@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "am.puzzle.harvest-relay",
+  "game": "am",
+  "world": "parampare",
+  "engine": {
+    "version": "am-engine-v1"
+  },
+  "ruleset": {
+    "id": "am.base",
+    "version": 1
+  },
+  "rng": {
+    "algorithm": "xoshiro128ss-v1",
+    "seed": "am.puzzle.harvest-relay.v1"
+  },
+  "titleKey": "am.puzzle.harvest-relay.title",
+  "briefKey": "am.puzzle.harvest-relay.brief",
+  "hintKeys": [
+    "am.puzzle.harvest-relay.hint.1"
+  ],
+  "difficulty": "medium",
+  "position": {
+    "kind": "state",
+    "state": {
+      "pits": [
+        10,
+        1,
+        10,
+        10,
+        10,
+        0,
+        3,
+        0,
+        10,
+        10,
+        0,
+        0,
+        10,
+        1
+      ],
+      "stores": [
+        7,
+        2
+      ],
+      "turn": 0,
+      "winner": null,
+      "events": []
+    },
+    "stateHash": "10670b725d323d33"
+  },
+  "goal": {
+    "type": "atLeast",
+    "path": "stores.0",
+    "n": 49
+  },
+  "constraints": {
+    "maxActions": 1,
+    "allowUndo": true
+  },
+  "solution": [
+    {
+      "type": "sow",
+      "pit": 4
+    }
+  ],
+  "par": 1
+}

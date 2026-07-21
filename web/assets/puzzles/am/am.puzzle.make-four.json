@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "am.puzzle.make-four",
+  "game": "am",
+  "world": "parampare",
+  "engine": {
+    "version": "am-engine-v1"
+  },
+  "ruleset": {
+    "id": "am.base",
+    "version": 1
+  },
+  "rng": {
+    "algorithm": "xoshiro128ss-v1",
+    "seed": "am.puzzle.make-four.v1"
+  },
+  "titleKey": "am.puzzle.make-four.title",
+  "briefKey": "am.puzzle.make-four.brief",
+  "hintKeys": [
+    "am.puzzle.make-four.hint.1"
+  ],
+  "difficulty": "easy",
+  "position": {
+    "kind": "state",
+    "state": {
+      "pits": [
+        1,
+        3,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "stores": [
+        20,
+        58
+      ],
+      "turn": 0,
+      "winner": null,
+      "events": []
+    },
+    "stateHash": "caf3fb3d61eeb64a"
+  },
+  "goal": {
+    "type": "atLeast",
+    "path": "stores.0",
+    "n": 24
+  },
+  "constraints": {
+    "maxActions": 1,
+    "allowUndo": true
+  },
+  "solution": [
+    {
+      "type": "sow",
+      "pit": 0
+    }
+  ],
+  "par": 1
+}

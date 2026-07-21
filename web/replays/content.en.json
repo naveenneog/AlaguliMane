@@ -1,0 +1,6 @@
+{
+  "am.replay.sow": "The seeds were sown from pit {pit}.",
+  "am.replay.relay": "The sow continued through {pickups} relay handfuls.",
+  "am.replay.capture": "This sow gathered {seeds} seeds.",
+  "am.replay.final": "The final sow and sweep settled the harvest."
+}

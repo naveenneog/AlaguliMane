@@ -1,0 +1,10 @@
+{
+  "am.share.result.win.title": "The Granary Overflows",
+  "am.share.result.win.body": "Gathered {score} seeds to {opponentScore} in {moves} moves.",
+  "am.share.result.loss.title": "The Harvest Is Counted",
+  "am.share.result.loss.body": "Held {score} seeds to {opponentScore} after {moves} moves.",
+  "am.share.result.draw.title": "An Even Harvest",
+  "am.share.result.draw.body": "Both stores held {score} seeds after {moves} moves.",
+  "am.share.puzzle.title": "Alaguli Mane Puzzle Solved",
+  "am.share.puzzle.body": "Solved in {moves} moves · par {par}."
+}

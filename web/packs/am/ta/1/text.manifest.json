@@ -1,0 +1,49 @@
+{
+  "format": "tbg-language-pack",
+  "schema": 1,
+  "game": "am",
+  "language": "ta",
+  "version": "1.8.0-alpha.1",
+  "contentVersion": 1,
+  "component": "text",
+  "fallbackLanguage": "en",
+  "bytes": 48935,
+  "sha256": "5729646bee3c6954032006ea8642bd8c47647987bad29086bf06d3a99e68b77b",
+  "files": [
+    {
+      "path": "packs/am/ta/1/ui.json",
+      "role": "ui",
+      "mediaType": "application/json",
+      "bytes": 31930,
+      "sha256": "e3b90f3e6d46b827648dea9e5428aebe8a10bd905285e88a3b0eeaa9c9562fe9"
+    },
+    {
+      "path": "packs/am/ta/1/world-malnad.json",
+      "role": "world",
+      "mediaType": "application/json",
+      "bytes": 4218,
+      "sha256": "61cf965b3bde37cc1c8831eebd8274e1f7e972449531cd842f80723a7af32da1"
+    },
+    {
+      "path": "packs/am/ta/1/world-parampare.json",
+      "role": "world",
+      "mediaType": "application/json",
+      "bytes": 4479,
+      "sha256": "252430e5dd1ffac6caeb93d0aadb8133d76b4048619f97b6f1836c6b93b11d10"
+    },
+    {
+      "path": "packs/am/ta/1/world-suggi.json",
+      "role": "world",
+      "mediaType": "application/json",
+      "bytes": 4113,
+      "sha256": "bb9a39eea39f0c0a943e8bf3b0e4b69825af3dde760b5672d8e01953d38f562a"
+    },
+    {
+      "path": "packs/am/ta/1/world-ulita.json",
+      "role": "world",
+      "mediaType": "application/json",
+      "bytes": 4195,
+      "sha256": "8bb58b33fbeda4af0c6ccb7194738044f497d24997465c0c497c2204a5b8a718"
+    }
+  ]
+}

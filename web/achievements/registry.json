@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": 1,
+  "game": "am",
+  "achievements": [
+    {
+      "id": "first-match",
+      "titleKey": "am.achievement.first-match.title",
+      "descKey": "am.achievement.first-match.desc",
+      "icon": "board-knot",
+      "tier": "bronze",
+      "when": { "type": "counterAtLeast", "counter": "games.played", "atLeast": 1 }
+    },
+    {
+      "id": "first-win",
+      "titleKey": "am.achievement.first-win.title",
+      "descKey": "am.achievement.first-win.desc",
+      "icon": "victory-leaf",
+      "tier": "bronze",
+      "when": { "type": "counterAtLeast", "counter": "games.won", "atLeast": 1 }
+    },
+    {
+      "id": "six-puzzles",
+      "titleKey": "am.achievement.six-puzzles.title",
+      "descKey": "am.achievement.six-puzzles.desc",
+      "icon": "puzzle-knot",
+      "tier": "silver",
+      "when": { "type": "counterAtLeast", "counter": "puzzles.solved", "atLeast": 6 }
+    },
+    {
+      "id": "first-daily",
+      "titleKey": "am.achievement.first-daily.title",
+      "descKey": "am.achievement.first-daily.desc",
+      "icon": "daily-lamp",
+      "tier": "bronze",
+      "when": { "type": "dailyCountAtLeast", "atLeast": 1 }
+    },
+    {
+      "id": "steady-rhythm",
+      "titleKey": "am.achievement.steady-rhythm.title",
+      "descKey": "am.achievement.steady-rhythm.desc",
+      "icon": "streak-thread",
+      "tier": "silver",
+      "when": { "type": "streakBestAtLeast", "atLeast": 3 }
+    },
+    {
+      "id": "generous-harvest",
+      "titleKey": "am.achievement.generous-harvest.title",
+      "descKey": "am.achievement.generous-harvest.desc",
+      "icon": "harvest-bowl",
+      "tier": "silver",
+      "when": { "type": "logStat", "evaluator": "am.max-harvest", "atLeast": 12 }
+    },
+    {
+      "id": "three-captures",
+      "titleKey": "am.achievement.three-captures.title",
+      "descKey": "am.achievement.three-captures.desc",
+      "icon": "seed-hand",
+      "tier": "gold",
+      "when": { "type": "logStat", "evaluator": "am.max-capture-events", "atLeast": 3 }
+    },
+    {
+      "id": "long-relay",
+      "titleKey": "am.achievement.long-relay.title",
+      "descKey": "am.achievement.long-relay.desc",
+      "icon": "relay-loop",
+      "tier": "silver",
+      "when": { "type": "logStat", "evaluator": "am.max-relay-pickups", "atLeast": 3 }
+    },
+    {
+      "id": "turning-tide",
+      "titleKey": "am.achievement.turning-tide.title",
+      "descKey": "am.achievement.turning-tide.desc",
+      "icon": "balance-scale",
+      "tier": "gold",
+      "when": { "type": "logStat", "evaluator": "am.win-after-lead-reversal", "atLeast": 1 }
+    }
+  ]
+}

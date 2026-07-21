@@ -1,0 +1,7 @@
+{
+  "am.recap.harvest.large": "This sow banked {seeds} seeds across {captures} captures.",
+  "am.recap.relay.long": "The relay continued through {pickups} handfuls before ending.",
+  "am.recap.lead.changed": "This harvest turned a deficit into a lead of {lead} seeds.",
+  "am.recap.final.sweep": "The final sow emptied the next side; the remaining rows were banked and the harvest ended.",
+  "am.recap.harvest.exposed": "This sow was followed by a rival harvest of {seeds} seeds."
+}

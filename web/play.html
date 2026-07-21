@@ -91,21 +91,21 @@
     <span class="filigree-corner tl"></span><span class="filigree-corner tr"></span>
     <span class="filigree-corner br"></span><span class="filigree-corner bl"></span>
   </div>
-  <nav><a href="index.html">‹ Home</a><a href="setup.html">Lobby</a><button id="restart">↻ Restart</button></nav>
+  <nav><a href="index.html" data-i18n>‹ Home</a><a href="setup.html" data-i18n>Lobby</a><button id="restart" data-i18n>↻ Restart</button></nav>
   <div id="title">Alaguli Mane</div>
   <div id="kn"></div>
   <div id="status"></div>
   <div id="thinking"></div>
-  <div id="card"><span class="kind">Captured</span><p class="en"></p><p class="m"></p></div>
+  <div id="card"><span class="kind" data-i18n>Captured</span><p class="en"></p><p class="m"></p></div>
   <div id="hud">
-    <div class="stat">You gathered<b id="store0">0</b></div>
+    <div class="stat"><span data-i18n>You gathered</span><b id="store0">0</b></div>
     <div class="turn"><span class="dot" id="turnDot"></span><span id="turnLabel">—</span></div>
-    <div class="stat">Rival<b id="store1">0</b></div>
-    <button id="hintBtn">💡 Hint</button>
-    <button id="undoBtn" title="Take back your last move" disabled>↶ Undo</button>
+    <div class="stat"><span data-i18n>Rival</span><b id="store1">0</b></div>
+    <button id="hintBtn" data-i18n>💡 Hint</button>
+    <button id="undoBtn" title="Take back your last turn" data-i18n data-i18n-title disabled>↶ Undo</button>
   </div>
   <div id="hint"></div>
-  <div id="win"><div class="box"><h1 id="winTitle"></h1><p id="winText"></p><button id="winAgain">Play again</button></div></div>
+  <div id="win"><div class="box"><h1 id="winTitle"></h1><p id="winText"></p><button id="winAgain" data-i18n>Play again</button></div></div>
   <script type="module" src="js/game3d.js"></script>
 </body>
 </html>

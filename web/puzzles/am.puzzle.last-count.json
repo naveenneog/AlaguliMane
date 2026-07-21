@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "id": "am.puzzle.last-count",
+  "game": "am",
+  "world": "parampare",
+  "engine": {
+    "version": "am-engine-v1"
+  },
+  "ruleset": {
+    "id": "am.base",
+    "version": 1
+  },
+  "rng": {
+    "algorithm": "xoshiro128ss-v1",
+    "seed": "am.puzzle.last-count.v1"
+  },
+  "titleKey": "am.puzzle.last-count.title",
+  "briefKey": "am.puzzle.last-count.brief",
+  "hintKeys": [
+    "am.puzzle.last-count.hint.1"
+  ],
+  "difficulty": "hard",
+  "position": {
+    "kind": "state",
+    "state": {
+      "pits": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "stores": [
+        37,
+        42
+      ],
+      "turn": 1,
+      "winner": null,
+      "events": []
+    },
+    "stateHash": "f4dabde84f9517c0"
+  },
+  "goal": {
+    "type": "winnerIs",
+    "side": 1
+  },
+  "constraints": {
+    "maxActions": 1,
+    "allowUndo": true
+  },
+  "solution": [
+    {
+      "type": "sow",
+      "pit": 12
+    }
+  ],
+  "par": 1
+}

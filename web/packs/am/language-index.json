@@ -1,0 +1,122 @@
+{
+  "format": "tbg-language-index",
+  "schema": 1,
+  "game": "am",
+  "defaultLanguage": "en",
+  "coreLanguages": [
+    "kn",
+    "en"
+  ],
+  "packs": [
+    {
+      "language": "hi",
+      "component": "text",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/hi/1/text.manifest.json",
+      "manifestBytes": 1435,
+      "manifestSha256": "b07ff045e49b884600b56de4e9702ab22d896c7e257d73945570ddcef4eb526f",
+      "packBytes": 40229,
+      "packSha256": "0d0929265a54c0f7581f23bb5aca05600fe623950a528b2b852ce7794eed53a1"
+    },
+    {
+      "language": "hi",
+      "component": "voice",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/hi/1/voice.manifest.json",
+      "manifestBytes": 17867,
+      "manifestSha256": "5a3d37835c4c060601e76ab6cac53b1006755c03b6a6940174eead326d749e43",
+      "packBytes": 1618693,
+      "packSha256": "f5d552690abf675aba4f3e85fba244e95324ac793f5061360e29246497ec8285"
+    },
+    {
+      "language": "ml",
+      "component": "text",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/ml/1/text.manifest.json",
+      "manifestBytes": 1435,
+      "manifestSha256": "1e8c6da1a9f7c127eb8d037333acef27770edc7304ea6b44436f875a2ca9bd2b",
+      "packBytes": 47274,
+      "packSha256": "c1fd57fb40cbdb96029cf2247060d1ff695af4c836210e9b93110db95771311d"
+    },
+    {
+      "language": "ml",
+      "component": "voice",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/ml/1/voice.manifest.json",
+      "manifestBytes": 17931,
+      "manifestSha256": "fe2e262bc1f624f4fc3bfb0558bdcb6bfd552ccb50efeeae1e2a1181ec44615b",
+      "packBytes": 1440502,
+      "packSha256": "116d30229d7f375b80704b8b5bd2d0d537b0d56f12d873d9d7f6c429d240156a"
+    },
+    {
+      "language": "mr",
+      "component": "text",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/mr/1/text.manifest.json",
+      "manifestBytes": 1435,
+      "manifestSha256": "f840387ff2f95d20b854a115a1b3694ff4467b68258bffcb4dec6b6963390d2b",
+      "packBytes": 40546,
+      "packSha256": "d016e26a97b3f92130e316a3e7175102cdd0573dfb8c59b3e57471392de7adf2"
+    },
+    {
+      "language": "mr",
+      "component": "voice",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/mr/1/voice.manifest.json",
+      "manifestBytes": 17903,
+      "manifestSha256": "c6c22568e381598aa35a8a44781101aec245396729ad61729a95751ca3b37ec3",
+      "packBytes": 1565839,
+      "packSha256": "ddd8a25acdaa8ceb5d6673794be34511da5f1ba2eee980aeee218c78de96c1ea"
+    },
+    {
+      "language": "ta",
+      "component": "text",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/ta/1/text.manifest.json",
+      "manifestBytes": 1435,
+      "manifestSha256": "b023398f2a34a03dc3b0a5e0f6f9a167114fbaf8e556a6f2c81e48060d2ad2c4",
+      "packBytes": 48935,
+      "packSha256": "5729646bee3c6954032006ea8642bd8c47647987bad29086bf06d3a99e68b77b"
+    },
+    {
+      "language": "ta",
+      "component": "voice",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/ta/1/voice.manifest.json",
+      "manifestBytes": 17935,
+      "manifestSha256": "308f764890314b6b11eb12ca3295cd311e4352c3ea075c1a6fafb56345750dbb",
+      "packBytes": 1589148,
+      "packSha256": "51e3e6e01f871503d2f6465dd0fdda4f0d502181d0a07086278f15a3e95c04f8"
+    },
+    {
+      "language": "te",
+      "component": "text",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/te/1/text.manifest.json",
+      "manifestBytes": 1435,
+      "manifestSha256": "88439a55ff0e58dc2a439661c3269803d47068366c6ec08daef2bf4754036559",
+      "packBytes": 43758,
+      "packSha256": "93f96ed5e7f0cd1ff3cb62392e6663a8d6c33db65361f111cfd4c5ce49fa79a3"
+    },
+    {
+      "language": "te",
+      "component": "voice",
+      "version": "1.8.0-alpha.1",
+      "contentVersion": 1,
+      "manifestPath": "packs/am/te/1/voice.manifest.json",
+      "manifestBytes": 17895,
+      "manifestSha256": "9bf4ce2f7a223fe689231d82ffe17dd8f2fedb5ae905acc0d1a04d66fb1226ca",
+      "packBytes": 1542163,
+      "packSha256": "4af575b2061538db0fc6e9f34fad8d65776fc3a76b6ad0d9bc9156b7886d1126"
+    }
+  ]
+}

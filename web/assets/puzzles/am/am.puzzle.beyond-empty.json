@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "am.puzzle.beyond-empty",
+  "game": "am",
+  "world": "parampare",
+  "engine": {
+    "version": "am-engine-v1"
+  },
+  "ruleset": {
+    "id": "am.base",
+    "version": 1
+  },
+  "rng": {
+    "algorithm": "xoshiro128ss-v1",
+    "seed": "am.puzzle.beyond-empty.v1"
+  },
+  "titleKey": "am.puzzle.beyond-empty.title",
+  "briefKey": "am.puzzle.beyond-empty.brief",
+  "hintKeys": [
+    "am.puzzle.beyond-empty.hint.1"
+  ],
+  "difficulty": "easy",
+  "position": {
+    "kind": "state",
+    "state": {
+      "pits": [
+        1,
+        0,
+        0,
+        4,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "stores": [
+        30,
+        47
+      ],
+      "turn": 0,
+      "winner": null,
+      "events": []
+    },
+    "stateHash": "492581429e2a0e51"
+  },
+  "goal": {
+    "type": "atLeast",
+    "path": "stores.0",
+    "n": 34
+  },
+  "constraints": {
+    "maxActions": 1,
+    "allowUndo": true
+  },
+  "solution": [
+    {
+      "type": "sow",
+      "pit": 0
+    }
+  ],
+  "par": 1
+}

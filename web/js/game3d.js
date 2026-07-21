@@ -11,27 +11,78 @@ import { PITS, newGame, legalMoves, applyMove, bestMove, ownPits, ownerOf } from
 import { makePit, makeStore, makeSeed, seedSlots } from './pieces3d.js';
 import { applyEnvironment, addContactShadow, applyRealistic, loadTexture, addTableWorld } from './sky.js';
 import { initTutorial } from './tutorial.js';
+import { maybeAutoDemo } from './auto-demo.js';
 import { createGrandEffects, playOpening } from './grand.js';
 import { initSettings, applySettings } from './settings.js';
 import { initSave } from './save.js';
 import { createCoachOverlay } from './coach3d.js';
 import { initLearn } from './learn.js';
-import { setLang as i18nSetLang, savedLang, loadWorldI18n, t as tr } from './i18n.js';
+import { initPuzzleUI } from './puzzle-ui.js';
+import { makeAmPuzzleIface } from './puzzle-iface.js';
+import { initProfile } from './profile.js';
+import { initProfileUI } from './profile-ui.js';
+import { validateAchievementRegistry, evaluateAchievements, newUnlocks, recordUnlocks } from './achievements.js';
+import { createAmAchievementEvaluators } from './achievement-insights.js';
+import { initReplayUI } from './replay-ui.js';
+import { describeAmTransition } from './replay-insights.js';
+import { renderShareCard, shareCard } from './share-card.js';
+import { drawShareBoard } from './share-board.js';
+import { buildSpectateLog, initSpectate } from './spectate.js';
+import { initSpectateUI } from './spectate-ui.js';
+import { createAmSpectateDriver } from './spectate-driver.js';
+import { encode as encodeChallenge } from './challenge-link.js';
+import { openLanguagePackDb, initLanguagePacks } from './language-pack.js';
+import { initLanguageStoreUI } from './language-store-ui.js';
+import { setLang as i18nSetLang, savedLang, loadWorldI18n, loadUII18n, localizeUI, setCatalogSource as i18nSetCatalogSource, t as tr } from './i18n.js';
+import { createRngSuite } from './rng.js';
+import { checkpoint, createLog, derive, setResult } from './action-log.js';
+import {
+  createEngineAdapter, ENGINE, RULESET, toAction, validateReplayAction, validateReplaySide,
+} from './engine-adapter.js';
 import * as audio from './audio.js';
+import { loadWorld } from './world-loader.js';
+import { projectAmWorldV2 } from './world-projection.js';
 
 const $ = (s) => document.querySelector(s);
 const hexInt = (h) => parseInt(String(h || '#000').replace('#', ''), 16) || 0;
 const hexBlend = (a, b, t) => { a = hexInt(a); b = hexInt(b); const ch = (s) => Math.round(((a >> s) & 255) + (((b >> s) & 255) - ((a >> s) & 255)) * t); return '#' + ((1 << 24) | (ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).slice(1); };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const rand = (a) => a[Math.floor(Math.random() * a.length)];
+const ACH_ICON_GLYPH = {
+  'board-knot': '🪢', 'victory-leaf': '🍃', 'puzzle-knot': '🧩', 'daily-lamp': '🪔', 'streak-thread': '🧵',
+  'trap-ring': '🎯', 'tiger-paw': '🐯', 'goat-shield': '🐐', 'seed-hand': '🌱', 'relay-loop': '🔁',
+  'harvest-bowl': '🥣', 'balance-scale': '⚖️', 'cowrie-shell': '🐚', 'home-gate': '🏠', 'safe-cell': '🛡️',
+  'mill-wheel': '🎡', 'flying-stone': '🪨', 'capture-ring': '💍',
+};
+const freshSeed = () => {
+  const words = new Uint32Array(2);
+  globalThis.crypto.getRandomValues(words);
+  return `0x${words[0].toString(16).padStart(8, '0')}${words[1].toString(16).padStart(8, '0')}`;
+};
 const SP = 1.15, CAP = 16;
 
 async function main() {
   const params = new URLSearchParams(location.search);
   let cfg = {}; try { cfg = JSON.parse(sessionStorage.getItem('am.game') || '{}'); } catch { cfg = {}; }
-  const worldId = (params.get('world') || cfg.world || 'parampare').replace(/[^a-z]/gi, '');
-  const world = await (await fetch(`worlds/${worldId}.json`)).json();
-  const uiLang = savedLang('am'); i18nSetLang(uiLang); audio.setLang(uiLang); await loadWorldI18n(worldId);
+  let rng = createRngSuite({ seed: params.get('seed') || cfg.seed || freshSeed() });
+  cfg.seed = rng.seed;
+  try { sessionStorage.setItem('am.game', JSON.stringify(cfg)); } catch { /* session persistence is optional */ }
+  const aiRng = (player) => rng.stream(`ai:${player}`);
+  const rand = (values) => rng.stream('audio').pick(values);
+  const engine = createEngineAdapter();
+  const requestedWorld = params.get('world') || cfg.world || 'parampare';
+  const worldId = /^[a-z][a-z0-9-]{0,63}$/i.test(requestedWorld) ? requestedWorld.toLowerCase() : 'parampare';
+  const world = await loadWorld(worldId, { game: 'am', projector: projectAmWorldV2 });
+  if (world.schema === 2 && !world.rulesetCompatibility.some(ref =>
+    ref.id === RULESET.id && ref.version === RULESET.version)) {
+    throw new RangeError(`World ${worldId} is incompatible with ruleset ${RULESET.id}@${RULESET.version}`);
+  }
+  const uiLang = savedLang('am');
+  i18nSetLang(uiLang);
+  audio.setLang(uiLang);
+  document.documentElement.lang = uiLang;
+  await loadWorldI18n(worldId);
+  await loadUII18n('am');
+  localizeUI();
   const T = world.theme || {};
   const REALISTIC = !!world.realistic;
   const mode = params.get('mode') || cfg.mode || 'ai';
@@ -42,8 +93,43 @@ async function main() {
   const pname = (p) => (p === 0 ? world.sides.p0.name : world.sides.p1.name);
   const controls = (p) => mode === 'hotseat' || p === 0;
 
-  let state = newGame(); let busy = true, fast = false, settingsApi = null, save = null, learn = null;
-  let learning = false, lessonMove = null;
+  let state = engine.newState(); let busy = true, fast = false, settingsApi = null, save = null, learn = null, replayUI = null, puzzleUI = null;
+  let learning = false, replaying = false, puzzling = false, lessonMove = null;
+  let puzzleMoveCount = 0, lastPuzzleShare = null, lastResultShare = null, spectate = null, spectateUI = null;
+  let languagePacks = null, languageStoreUI = null, languagePacksReady = Promise.resolve(null);
+  const storeSeed = () => {
+    cfg.seed = rng.seed;
+    try { sessionStorage.setItem('am.game', JSON.stringify(cfg)); } catch { /* session persistence is optional */ }
+  };
+  const freshLog = () => createLog({
+    game: 'am',
+    engine: ENGINE,
+    ruleset: RULESET,
+    world: worldId,
+    rng,
+  });
+  const rngUse = (stream, before) => {
+    const draws = stream.draws - before;
+    return draws > 0 ? [{ stream: stream.name, draws }] : undefined;
+  };
+  const recordAction = (side, move, rngUses) => {
+    if (learning || replaying || puzzling || !save) return;
+    const stateHash = engine.hash(state);
+    save.record({ side, action: toAction(move), rngUses, stateHash });
+    if (save.log.actions.length % 16 === 0) {
+      checkpoint(save.log, {
+        afterAction: save.log.actions.length,
+        state: JSON.parse(JSON.stringify(state)),
+        rngState: rng.snapshot({ canonicalOnly: true }),
+        stateHash,
+      });
+      save.persist();
+    }
+    if (state.winner !== null) {
+      setResult(save.log, { winner: state.winner, afterAction: save.log.actions.length });
+      save.persist();
+    }
+  };
 
   const MOBILE = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 760;
   const renderer = new THREE.WebGLRenderer({ antialias: !MOBILE, powerPreference: 'high-performance' });
@@ -73,11 +159,11 @@ async function main() {
   const pitPos = (i) => (i <= 6 ? new THREE.Vector3((i - 3) * SP, 0, 1.05 * SP) : new THREE.Vector3((3 - (i - 7)) * SP, 0, -1.05 * SP));
   const storePos = (p) => new THREE.Vector3((p === 0 ? 4.4 : -4.4) * SP, 0, 0);
   const slab = new THREE.Mesh(new THREE.BoxGeometry(10.6 * SP, 0.4, 3.2 * SP), REALISTIC
-    ? new THREE.MeshStandardMaterial({ map: loadTexture(`assets/${worldId}/board.jpg`, [3, 1]), roughness: 0.55, metalness: 0.08, envMapIntensity: 1.15 })
+    ? new THREE.MeshStandardMaterial({ map: loadTexture(`assets/${worldId}/board.jpg`, [1, 1]), roughness: 0.55, metalness: 0.08, envMapIntensity: 1.15 })
     : new THREE.MeshStandardMaterial({ color: hexInt(T.board), roughness: 0.6, metalness: 0.28, envMapIntensity: 0.5 }));
   slab.position.y = -0.22; slab.receiveShadow = true; scene.add(slab);
   addContactShadow(scene, 6.2 * SP, -0.04, 0.42);
-  if (REALISTIC) addTableWorld(scene, { radius: 9 * SP, tableY: -0.44, woodUrl: `assets/${worldId}/board.jpg`, floorHex: hexInt(T.bg) });
+  if (REALISTIC) addTableWorld(scene, { radius: 9 * SP, tableY: -0.44, woodUrl: `assets/${worldId}/board.jpg`, tableUrl: `assets/${worldId}/table.jpg`, tableRepeat: [5, 5], floorHex: hexInt(T.bg) });
   const rimMat = new THREE.MeshStandardMaterial(REALISTIC ? { color: hexInt(T.accent), emissive: 0x000000, roughness: 0.4, metalness: 0.85, envMapIntensity: 1.2 } : { color: hexInt(T.accent), emissive: hexInt(T.accent), emissiveIntensity: 0.35, roughness: 0.35, metalness: 0.5, envMapIntensity: 0.9 });
   const wellMat = new THREE.MeshStandardMaterial(REALISTIC ? { color: hexInt(T.pit), roughness: 0.75, metalness: 0.05, envMapIntensity: 0.5 } : { color: hexInt(T.pit), roughness: 0.7, metalness: 0.15, envMapIntensity: 0.4 });
   const pitGroups = [], pitFlash = [];
@@ -142,7 +228,7 @@ async function main() {
 
   const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
   function onTap(e) {
-    if (busy || state.winner !== null || (!learning && !controls(state.turn))) return;
+    if (replaying || busy || state.winner !== null || (!learning && !puzzling && !controls(state.turn))) return;
     ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObjects([...pitGroups, ...glow], true); if (!hits.length) return;
     let o = hits[0].object; while (o && o.userData.pit === undefined && o.parent) o = o.parent;
@@ -153,14 +239,21 @@ async function main() {
   const lessonAllows = (pit) => !learning || pit === lessonMove;
 
   // ---- move + animate cascade ----
-  async function doMove(start) {
-    if (busy || !lessonAllows(start)) return; busy = true; clearGlow(); clearHint(); updateUndo();
-    const before = state; if (!learning) save.record(); state = applyMove(before, start);
+  async function doMove(start, rngUses) {
+    if (replaying || busy || !lessonAllows(start)) return; busy = true; clearGlow(); clearHint(); updateUndo();
+    const before = state; const side = before.turn; state = engine.applyLive(before, toAction(start));
+    recordAction(side, start, rngUses);
     await animateTurn(before, state.events);
     fullRelayout();
+    if (puzzling) {
+      puzzleMoveCount++;
+      const solved = puzzleUI?.report(state);
+      if (!solved) puzzleUI?.fail();
+      busy = true;
+      return;
+    }
     const captured = state.stores[before.turn] - before.stores[before.turn];
     if (!learning && captured > 0 && state.winner === null) await reveal('capture', rand(world.teachings.capture));
-    if (!learning) save.persist();
     learn?.notifyMove(start);
     if (state.winner !== null) { if (!learning) await onWin(); busy = false; updateUndo(); return; }
     busy = false; updateUndo();
@@ -209,45 +302,60 @@ async function main() {
     if (next.stores[state.turn] > state.stores[state.turn]) coach.destination(storePos(state.turn), { radius: 0.68, y: 0.18 });
   }
   function showHint() {
-    if (learning || busy || state.winner !== null || !controls(state.turn)) return;
+    if (learning || replaying || puzzling || busy || state.winner !== null || !controls(state.turn)) return;
     const mv = bestMove(state, Math.max(2, level)); if (mv === null) return; clearHint();
     const ns = applyMove(state, mv); const gained = ns.stores[state.turn] - state.stores[state.turn];
-    const txt = gained > 0 ? `Sow the glowing pit — this move gathers ${gained} seed${gained > 1 ? 's' : ''} for you.` : 'Sow the glowing pit — it keeps seeds on your side and sets up future fours.';
+    const txt = gained === 1
+      ? tr('Sow the glowing pit — this move gathers one seed for you.')
+      : gained > 1
+        ? tr('Sow the glowing pit — this move gathers %s seeds for you.').replace('%s', gained)
+        : tr('Sow the glowing pit — it keeps seeds on your side and sets up future fours.');
     previewSow(mv, ns);
     const h = $('#hint'); if (h) { h.textContent = '💡 ' + txt; h.classList.add('show'); } hintTimer = setTimeout(clearHint, 5200);
   }
 
   // ---- turn loop ----
   function loop() {
-    if (learning || state.winner !== null) return;
+    if (learning || replaying || puzzling || state.winner !== null) return;
     updateHud();
     if (controls(state.turn)) {
       highlight();
-      $('#status').textContent = `${pname(state.turn)}: tap one of your pits to sow`;
+      $('#status').textContent = tr('%s: tap one of your pits to sow').replace('%s', pname(state.turn));
       updateUndo();
     } else aiTurn();
   }
   async function aiTurn() {
-    if (learning) return;
+    if (learning || replaying || puzzling) return;
     busy = true; updateUndo(); $('#thinking').classList.add('show'); await wait(300);
-    if (learning) { busy = false; $('#thinking').classList.remove('show'); updateUndo(); return; }
-    const mv = bestMove(state, level); $('#thinking').classList.remove('show');
+    if (learning || replaying || puzzling) { busy = false; $('#thinking').classList.remove('show'); updateUndo(); return; }
+    const stream = aiRng(state.turn); const beforeDraws = stream.draws;
+    const mv = bestMove(state, level, stream); const rngUses = rngUse(stream, beforeDraws);
+    $('#thinking').classList.remove('show');
     if (mv === null) { busy = false; updateUndo(); return; }
     busy = false;
-    await doMove(mv);
+    await doMove(mv, rngUses);
   }
 
   // ---- reveal + win + hud ----
   const card = $('#card');
-  async function reveal(kind, t) { if (!t) return; card.querySelector('.kind').textContent = 'Captured'; card.querySelector('.kind').className = 'kind capture'; card.querySelector('.en').textContent = t.en || ''; card.querySelector('.m').textContent = tr(t.text); card.classList.add('show'); audio.narrate(t.text, world); await wait(fast ? 0 : 1700); card.classList.remove('show'); await wait(fast ? 0 : 200); }
+  async function reveal(kind, t) { if (!t) return; card.querySelector('.kind').textContent = tr('Captured'); card.querySelector('.kind').className = 'kind capture'; card.querySelector('.en').textContent = t.en || ''; card.querySelector('.m').textContent = tr(t.text); card.classList.add('show'); audio.narrate(t.text, world); await wait(fast ? 0 : 1700); card.classList.remove('show'); await wait(fast ? 0 : 200); }
   async function onWin() {
-    save?.clear();
     updateUndo();
     const w = state.winner; const won = w === 'draw' ? null : (mode === 'hotseat' || w === 0);
+    lastResultShare = {
+      outcome: w === 'draw' ? 'draw' : (w === 0 ? 'win' : 'loss'),
+      moves: save?.log?.actions?.length ?? 0,
+      score: state.stores[0],
+      opponentScore: state.stores[1],
+      state: publicShareState(state),
+    };
+    if (w === 0) profile.bump('games.won');
     audio.sfx(won === false ? 'lose' : 'win');
     const t = w === 'draw' ? { text: 'The seeds are shared exactly — a rare, perfectly even harvest. A draw.' } : rand(won ? world.teachings.win : world.teachings.lose);
-    const ov = $('#win'); ov.querySelector('#winTitle').textContent = w === 'draw' ? 'A draw' : `${pname(w)} gathers the most`;
-    ov.querySelector('#winText').textContent = tr(t.text); ov.classList.add('show'); grand.victoryShower(); settingsApi?.haptic('win'); audio.narrate(t.text, world);
+    const ov = $('#win'); ov.querySelector('#winTitle').textContent = w === 'draw'
+      ? tr('A draw') : tr('%s gathers the most').replace('%s', pname(w));
+    ov.querySelector('#winText').textContent = tr(t.text); ov.classList.add('show'); resultShareButton.hidden = false; grand.victoryShower(); settingsApi?.haptic('win'); audio.narrate(t.text, world);
+    awardAchievements('live', { log: save.log, finalState: state });
   }
   function updateHud() {
     $('#store0').textContent = state.stores[0]; $('#store1').textContent = state.stores[1];
@@ -268,31 +376,156 @@ async function main() {
 
   function restoreState(saved) {
     applyStateVisual(saved);
-    if (!learning) loop();
+    if (!learning && !replaying) loop();
   }
 
   function updateUndo() {
     const button = $('#undoBtn');
-    if (button) button.disabled = !(save && !learning && !busy && state.winner === null && controls(state.turn) && save.canUndo());
+    if (button) button.disabled = !(save && !learning && !replaying && !puzzling && !busy && state.winner === null && controls(state.turn) && save.canUndo());
     const learnButton = $('#tbg-learn-btn');
-    if (learnButton) learnButton.disabled = busy && !learning;
+    if (learnButton) learnButton.disabled = replaying || puzzling || (busy && !learning);
+    const puzzleButton = $('#pz-open');
+    if (puzzleButton) puzzleButton.disabled = busy || learning || replaying || puzzling;
+    const replayButton = $('#rp-open');
+    if (replayButton) replayButton.disabled = busy || learning || replaying || puzzling;
   }
 
   function doUndo() {
-    if (learning || busy || state.winner !== null || !controls(state.turn) || !save?.canUndo()) return;
+    if (learning || replaying || puzzling || busy || state.winner !== null || !controls(state.turn) || !save?.canUndo()) return;
     audio.sfx('step');
-    save.undo();
+    const restored = save.undo();
+    if (restored) {
+      const replayed = derive(save.log, engine);
+      rng = replayed.rng;
+      storeSeed();
+      applyStateVisual(replayed.state);
+      loop();
+    }
     updateUndo();
   }
   updateHud();
 
   (function frame() { const t = performance.now(); for (const r of glow) r.position.y = 0.08 + Math.sin(t * 0.005 + r.position.x) * 0.03; coach.update(); grand.update(); composer.render(); requestAnimationFrame(frame); })();
-  $('#restart').addEventListener('click', () => { save?.clear(); location.reload(); });
+  function publicShareState(source = state) {
+    return {
+      pits: Array.isArray(source?.pits) ? source.pits.slice(0, PITS) : [],
+      stores: Array.isArray(source?.stores) ? source.stores.slice(0, 2) : [0, 0],
+      turn: source?.turn ?? 0,
+      winner: source?.winner ?? null,
+    };
+  }
+  function formatShareText(key, params = {}) {
+    let text = tr(key);
+    for (const [name, value] of Object.entries(params)) {
+      text = text.replaceAll(`{${name}}`, String(value));
+    }
+    return text;
+  }
+  async function shareGameCard({ kind, titleKey, bodyKey, params: cardParams, cardState, url, downloadName }, button) {
+    const old = button?.textContent;
+    if (button) { button.disabled = true; button.textContent = tr('Sharing…'); }
+    try {
+      const rendered = await renderShareCard({
+        kind,
+        game: 'am',
+        world: worldId,
+        locale: uiLang,
+        titleKey,
+        bodyKey,
+        params: cardParams,
+        state: cardState,
+        drawBoard: (ctx, box) => drawShareBoard(ctx, box, { world }),
+        translate: tr,
+      });
+      const result = await shareCard({
+        file: rendered.file,
+        title: formatShareText(titleKey, cardParams),
+        text: formatShareText(bodyKey, cardParams),
+        url,
+        downloadName,
+      });
+      if (button && result.method !== 'cancel') {
+        button.textContent = result.method === 'file-share' || result.method === 'url-share' ? tr('Shared')
+          : result.method === 'clipboard' ? tr('Link copied') : tr('Saved image');
+      }
+      return result;
+    } catch {
+      if (button) button.textContent = tr('Share unavailable');
+      return { method: 'unavailable' };
+    } finally {
+      if (button) setTimeout(() => { button.disabled = false; button.textContent = old || tr('Share'); }, 1800);
+    }
+  }
+  function shareAchievement(achievement, button) {
+    return shareGameCard({
+      kind: 'achievement',
+      titleKey: achievement.titleKey,
+      bodyKey: achievement.descKey,
+      params: { achievementId: achievement.id, tier: achievement.tier },
+      cardState: publicShareState(),
+      downloadName: `alaguli-mane-${achievement.id}.png`,
+    }, button);
+  }
+  async function sharePuzzleResult(payload, button) {
+    let url;
+    try {
+      const hash = await encodeChallenge({ game: 'am', puzzleId: payload.spec.id });
+      url = `${location.origin}${location.pathname}${location.search}${hash}`;
+    } catch { url = location.href; }
+    return shareGameCard({
+      kind: 'puzzle',
+      titleKey: 'am.share.puzzle.title',
+      bodyKey: 'am.share.puzzle.body',
+      params: {
+        puzzleId: payload.spec.id,
+        difficulty: payload.spec.difficulty ?? 'easy',
+        moves: payload.moves,
+        par: payload.par,
+        daily: payload.isDaily,
+      },
+      cardState: payload.state,
+      url,
+      downloadName: `alaguli-mane-puzzle-${payload.spec.id}.png`,
+    }, button);
+  }
+  const restartMatch = () => {
+    save?.clear();
+    rng = createRngSuite({ seed: freshSeed() });
+    storeSeed();
+    location.reload();
+  };
+  $('#restart').addEventListener('click', restartMatch);
   addEventListener('pointerdown', () => audio.unlock(worldId), { once: true });
-  $('#winAgain')?.addEventListener('click', () => { save?.clear(); location.reload(); });
+  $('#winAgain')?.addEventListener('click', restartMatch);
+  const resultShareButton = document.createElement('button');
+  resultShareButton.type = 'button';
+  resultShareButton.textContent = tr('Share');
+  resultShareButton.hidden = true;
+  resultShareButton.style.cssText = 'margin-left:.5rem';
+  $('#winAgain')?.insertAdjacentElement('afterend', resultShareButton);
+  resultShareButton.addEventListener('click', () => {
+    if (!lastResultShare) return;
+    const payload = lastResultShare;
+    shareGameCard({
+      kind: 'result',
+      titleKey: `am.share.result.${payload.outcome}.title`,
+      bodyKey: `am.share.result.${payload.outcome}.body`,
+      params: {
+        outcome: payload.outcome,
+        side: 0,
+        moves: payload.moves,
+        score: payload.score,
+        opponentScore: payload.opponentScore,
+      },
+      cardState: payload.state,
+      downloadName: `alaguli-mane-${payload.outcome}.png`,
+    }, resultShareButton);
+  });
   $('#hintBtn')?.addEventListener('click', showHint);
   $('#undoBtn')?.addEventListener('click', doUndo);
-  initTutorial({ key: 'am.tut.v1', title: 'How to play', accent: T.accent, steps: [
+  let demoPending = false; try { demoPending = !localStorage.getItem('tbg.am.demo.v1'); } catch { /* */ }
+  demoPending = demoPending && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  initTutorial({ key: 'am.tut.v1', title: 'How to play', accent: T.accent, autoOpen: !demoPending, steps: [
     { icon: '🌱', title: 'Alaguli Mane', text: 'A game of counting, not luck. Two rows of seven pits, six seeds each — gather more seeds than your rival.' },
     { icon: '👆', title: '1 · Sow', text: 'Tap one of your glowing pits. Its seeds are lifted and dropped one per pit, going counter-clockwise.' },
     { icon: '4️⃣', title: 'Capture on four', text: 'Whenever a pit reaches exactly four seeds, you collect all four into your store.' },
@@ -306,12 +539,52 @@ async function main() {
       applySettings(settings, { bloomPass: bloom, grand, audio });
       coach.setPreferences(settings);
     },
+    onLanguageRequest: (lang) => languageStoreUI?.requestLanguage(lang),
   });
   save = initSave({
     id: 'am',
-    serialize: () => state,
-    restore: restoreState,
+    adapter: engine,
     isMyTurn: (saved) => controls(saved.turn),
+  });
+  save.begin(freshLog());
+  function restoreReplayLive() {
+    replaying = false;
+    const restored = derive(save.log, engine);
+    state = restored.state;
+    rng = restored.rng;
+    storeSeed();
+    applyStateVisual(state);
+    if (state.winner !== null) {
+      $('#win').classList.add('show');
+      resultShareButton.hidden = !lastResultShare;
+    } else loop();
+    updateUndo();
+  }
+  replayUI = initReplayUI({
+    id: 'am',
+    adapter: engine,
+    validation: {
+      game: 'am',
+      engine: ENGINE,
+      ruleset: RULESET,
+      validateAction: validateReplayAction,
+      validateSide: validateReplaySide,
+    },
+    renderState: (next) => {
+      replaying = true;
+      applyStateVisual(next);
+      updateUndo();
+    },
+    restoreLive: restoreReplayLive,
+    describeTransition: describeAmTransition,
+    narrate: (text) => audio.narrate(text, world),
+    translate: tr,
+    reducedMotion: settingsApi.get().reducedMotion
+      || matchMedia('(prefers-reduced-motion: reduce)').matches,
+    accent: T.accent,
+  });
+  $('#rp-open')?.addEventListener('click', () => {
+    if (save?.log?.actions?.length) replayUI.load(save.log);
   });
   function lessonState(moves = []) {
     let next = newGame();
@@ -419,23 +692,338 @@ async function main() {
         clearGlow();
         clearHint();
         $('#thinking').classList.remove('show');
-        if (active) $('#status').textContent = 'Guided lesson — follow the gold path';
+        if (active) $('#status').textContent = tr('Guided lesson — follow the gold path');
         updateUndo();
       },
       freshGame: () => {
         save.clear();
-        applyStateVisual(newGame());
+        rng = createRngSuite({ seed: freshSeed() });
+        storeSeed();
+        save.begin(freshLog());
+        applyStateVisual(engine.newState());
         loop();
       },
     },
   });
+  const amIface = makeAmPuzzleIface();
+  const profile = initProfile({ id: 'am' });
+  initProfileUI({ id: 'am', accent: T.accent, profile });
+  const OPTIONAL_LANGUAGES = ['hi', 'ta', 'te', 'ml', 'mr'];
+  languagePacksReady = (async () => {
+    try {
+      // v1.8 α1 flip: core-config.json (emitted by tooling/build-core.mjs; dev ships all-languages/relative)
+      // picks the packaging profile + optional remote pack origin. A staged `default-core` core is
+      // authoritative and cannot be loosened via ?langprofile because its optional originals are absent.
+      const coreConfig = await fetch('core-config.json').then((response) =>
+        response.ok ? response.json() : null).catch(() => null);
+      const configProfile = coreConfig?.profile === 'default-core' ? 'default-core' : 'all-languages';
+      const packBaseUrl = coreConfig?.packBaseUrl || null;
+      const [trustedIndex, schema] = await Promise.all([
+        // Index + schema are local trust anchors. Only the pinned payloads use packBaseUrl.
+        fetch('packs/am/language-index.json').then((response) => response.ok ? response.json() : null),
+        fetch('schemas/v1.8/language-pack.schema.json').then((response) => response.ok ? response.json() : null),
+      ]);
+      if (!trustedIndex || typeof caches === 'undefined') return null;
+      const db = await openLanguagePackDb();
+      const profileName = configProfile === 'default-core'
+        ? 'default-core'
+        : (params.get('langprofile') || 'all-languages');
+      const bundled = profileName === 'all-languages' ? OPTIONAL_LANGUAGES : [];
+      languagePacks = initLanguagePacks({
+        game: 'am',
+        coreLanguages: ['kn', 'en'],
+        trustedIndex,
+        schema,
+        fetchImpl: fetch,
+        packBaseUrl,
+        cacheStorage: caches,
+        db,
+        maxPackBytes: 8 * 1024 * 1024,
+        compatibility: {
+          languages: bundled,
+          components: ['text'],
+          loadText: async (language) => {
+            const response = await fetch(`assets/ui/${language}.json`);
+            return response.ok ? response.json() : {};
+          },
+        },
+      });
+      await languagePacks.repair();
+      i18nSetCatalogSource((language, role, options) =>
+        languagePacks.getCatalog(language, role, options));
+      audio.setVoiceSource((language, text, scope) =>
+        languagePacks.getVoiceFile(language, text, scope));
+      if (OPTIONAL_LANGUAGES.includes(uiLang)) {
+        try {
+          const status = await languagePacks.status(uiLang, 'text');
+          if (status.state === 'installed' || status.state === 'compatibility') {
+            await languagePacks.activate(uiLang);
+            await loadUII18n('am');
+            await loadWorldI18n(worldId);
+            localizeUI();
+          }
+        } catch { /* leave the English fallback */ }
+      }
+      try {
+        languageStoreUI = initLanguageStoreUI({
+          packs: languagePacks,
+          translate: tr,
+          accent: T.accent,
+          getSelectedLanguage: () => uiLang,
+          dataSaver: navigator.connection?.saveData === true,
+          onActivated: async (language, snapshot, metadata) => {
+            languageStoreUI?.refresh();
+            if (metadata?.preservePreference === true) {
+              i18nSetLang(language);
+              audio.setLang(language);
+              await loadWorldI18n(worldId);
+              await loadUII18n('am');
+              localizeUI();
+            } else {
+              settingsApi.setLanguage(language, { persist: true });
+              location.reload();
+            }
+          },
+        });
+      } catch (error) {
+        console.warn('language store UI unavailable:', error?.message || error);
+      }
+      return languagePacks;
+    } catch (error) {
+      console.warn('language packs unavailable:', error?.message || error);
+      return null;
+    }
+  })();
+  const achievementEvaluators = createAmAchievementEvaluators({ adapter: engine });
+  let achievementRegistry = null;
+  (async () => {
+    try {
+      const registry = await (await fetch('achievements/registry.json')).json();
+      validateAchievementRegistry(registry);
+      achievementRegistry = registry;
+    } catch { achievementRegistry = null; }
+  })();
+  function showAchievementToast(list) {
+    let host = document.getElementById('achToasts');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'achToasts';
+      host.setAttribute('aria-live', 'polite');
+      host.style.cssText = 'position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:70;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;width:min(92vw,420px)';
+      document.body.appendChild(host);
+    }
+    for (const achievement of list) {
+      const toast = document.createElement('div');
+      toast.setAttribute('role', 'status');
+      toast.style.cssText = `pointer-events:auto;display:flex;align-items:center;gap:.7rem;background:${T.accent || '#e8c24a'};color:#241200;border-radius:16px;padding:.7rem .9rem;box-shadow:0 10px 30px rgba(0,0,0,.35);cursor:pointer;transform:translateY(14px);opacity:0;transition:transform .3s ease,opacity .3s ease`;
+      const icon = document.createElement('span'); icon.setAttribute('aria-hidden', 'true'); icon.style.cssText = 'font-size:1.6rem;line-height:1;flex:0 0 auto'; icon.textContent = ACH_ICON_GLYPH[achievement.icon] || '🏅';
+      const col = document.createElement('span'); col.style.cssText = 'display:flex;flex-direction:column;min-width:0';
+      const kicker = document.createElement('strong'); kicker.style.cssText = 'font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;opacity:.75'; kicker.textContent = tr('Achievement unlocked');
+      const title = document.createElement('span'); title.style.cssText = 'font-weight:700;font-size:1rem'; title.textContent = tr(achievement.titleKey);
+      const desc = document.createElement('span'); desc.style.cssText = 'font-size:.86rem;opacity:.9'; desc.textContent = tr(achievement.descKey);
+      const share = document.createElement('button'); share.type = 'button'; share.textContent = tr('Share'); share.style.cssText = 'margin-left:auto;flex:0 0 auto;border:1px solid currentColor;border-radius:999px;padding:.35rem .6rem;background:transparent;color:inherit;font:inherit;font-size:.8rem;cursor:pointer';
+      share.addEventListener('click', (event) => { event.stopPropagation(); shareAchievement(achievement, share); });
+      col.append(kicker, title, desc); toast.append(icon, col, share); host.appendChild(toast);
+      requestAnimationFrame(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; });
+      settingsApi?.haptic?.('win');
+      const dismiss = () => { toast.style.opacity = '0'; toast.style.transform = 'translateY(14px)'; setTimeout(() => toast.remove(), 320); };
+      toast.addEventListener('click', dismiss);
+      setTimeout(dismiss, 5600);
+    }
+  }
+  function awardAchievements(source, { log = null, finalState = null } = {}) {
+    if (!achievementRegistry) return;
+    try {
+      const results = evaluateAchievements(achievementRegistry, {
+        profile: profile.snapshot(), log, finalState,
+        evaluators: achievementEvaluators, context: { source },
+      });
+      const unlocked = newUnlocks(results, profile.snapshot());
+      if (!unlocked.length) return;
+      recordUnlocks(profile, unlocked);
+      showAchievementToast(unlocked);
+    } catch { /* achievements are optional cosmetics — never break play */ }
+  }
+  let openingDone = false, hashLaunched = false;
+  function maybeLaunchHash() {
+    if (hashLaunched || !openingDone || !puzzleUI) return;
+    hashLaunched = true;
+    puzzleUI.launchFromHash();
+  }
+  function enterPuzzle(spec) {
+    if (learning || replaying) return;
+    puzzling = true;
+    puzzleMoveCount = 0;
+    lastPuzzleShare = null;
+    clearGlow();
+    clearHint();
+    $('#thinking').classList.remove('show');
+    applyStateVisual(JSON.parse(JSON.stringify(spec.position.state)));
+    busy = false;
+    updateUndo();
+  }
+  function exitPuzzle() {
+    puzzling = false;
+    try {
+      const restored = derive(save.log, engine);
+      state = restored.state;
+      rng = restored.rng;
+      storeSeed();
+    } catch {
+      state = engine.newState();
+    }
+    applyStateVisual(state);
+    loop();
+  }
+  (async () => {
+    try {
+      const idx = await (await fetch('assets/puzzles/am/index.json')).json();
+      const specs = await Promise.all(idx.puzzles.map((p) => fetch(`assets/puzzles/am/${p.id}.json`).then((response) => response.json())));
+      puzzleUI = initPuzzleUI({
+        id: 'am',
+        accent: T.accent,
+        profile,
+        iface: amIface,
+        index: { version: idx.version, puzzles: specs },
+        hooks: {
+          enter: enterPuzzle,
+          exit: exitPuzzle,
+          narrate: (text) => audio.narrate(text, world),
+          solved: ({ spec, isDaily }) => {
+            lastPuzzleShare = {
+              spec,
+              isDaily,
+              moves: puzzleMoveCount,
+              par: spec.par ?? spec.solution?.length ?? puzzleMoveCount,
+              state: publicShareState(state),
+            };
+            awardAchievements(isDaily ? 'daily' : 'puzzle');
+          },
+        },
+      });
+      $('#pz-share')?.addEventListener('click', (event) => {
+        if (!lastPuzzleShare) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        sharePuzzleResult(lastPuzzleShare, event.currentTarget);
+      }, true);
+      maybeLaunchHash();
+      updateUndo();
+    } catch { /* puzzles unavailable — button simply absent */ }
+  })();
   updateUndo();
+  const spectateReducedMotion = settingsApi.get().reducedMotion
+    || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const spectateSaveData = navigator.connection?.saveData === true;
+  const spectateLevel = 2;
+  const spectateDriver = createAmSpectateDriver({ level: spectateLevel });
+  spectate = initSpectate({
+    generate: (seed = freshSeed()) => {
+      if (!openingDone || busy || learning || puzzling || replaying || state.winner !== null || !controls(state.turn)) {
+        throw new Error('spectate is unavailable while another mode is active');
+      }
+      const spectateRng = createRngSuite({ seed });
+      const log = createLog({
+        game: 'am',
+        engine: ENGINE,
+        ruleset: RULESET,
+        world: worldId,
+        rng: spectateRng,
+      });
+      log.setup = { ai: { id: 'am.minimax', version: 1, level: spectateLevel } };
+      return buildSpectateLog({
+        log,
+        adapter: engine,
+        driver: spectateDriver,
+        maxActions: 512,
+        repetition: 3,
+      });
+    },
+    replayUI,
+    restoreLive: restoreReplayLive,
+    reducedMotion: spectateReducedMotion,
+    saveData: spectateSaveData,
+  });
+  spectateUI = initSpectateUI({
+    spectate,
+    translate: tr,
+    accent: T.accent,
+    reducedMotion: spectateReducedMotion,
+    saveData: spectateSaveData,
+  });
+  let attractTimer = null;
+  function canStartAttract() {
+    return openingDone && !document.hidden && !busy && !learning && !puzzling && !replaying
+      && state.winner === null && controls(state.turn) && (save?.log?.actions?.length ?? 0) === 0
+      && !location.hash.startsWith('#c=')
+      && !document.querySelector('[role="dialog"].show,[aria-modal="true"].show,#win.show');
+  }
+  function resetAttractTimer() {
+    if (attractTimer !== null) clearTimeout(attractTimer);
+    attractTimer = null;
+    if (spectateReducedMotion || spectateSaveData) return;
+    attractTimer = setTimeout(async () => {
+      attractTimer = null;
+      if (!canStartAttract()) { resetAttractTimer(); return; }
+      await spectateUI.start();
+    }, 60000);
+  }
+  addEventListener('pointerdown', resetAttractTimer, { passive: true });
+  addEventListener('keydown', resetAttractTimer, { passive: true });
   window.__am = {
-    get state() { return state; }, get busy() { return busy; }, get learning() { return learning; }, world,
+    get state() { return state; }, get busy() { return busy; }, get learning() { return learning; }, get replaying() { return replaying; }, get puzzling() { return puzzling; },
+    get log() { return save?.log; }, world,
+    award: (source, options) => awardAchievements(source, options || {}),
+    achToast: (list) => showAchievementToast(list),
+    achRegistry: () => achievementRegistry,
+    packs: () => languagePacks,
+    packsReady: () => languagePacksReady,
+    shareResult: () => resultShareButton.click(),
+    renderShareTest: async () => {
+      const { blob } = await renderShareCard({
+        kind: 'result',
+        game: 'am',
+        world: worldId,
+        locale: uiLang,
+        titleKey: 'am.share.result.win.title',
+        bodyKey: 'am.share.result.win.body',
+        params: { outcome: 'win', side: 0, moves: 42, score: 48, opponentScore: 36 },
+        state: publicShareState(),
+        drawBoard: (ctx, box) => drawShareBoard(ctx, box, { world }),
+        translate: tr,
+      });
+      return blob?.size ?? 0;
+    },
+    spectate: {
+      start: (seed) => spectateUI.start(seed),
+      pause: () => spectate.pause(),
+      skip: () => spectateUI.skip(),
+      info: () => ({ active: spectate.active, playing: spectate.playing, result: spectate.current?.result ?? null }),
+    },
     setFast(v) { fast = v; },
     play: (pit) => doMove(pit),
-    async autoplay(maxTurns = 120) { fast = true; let n = 0; while (state.winner === null && n < maxTurns) { n++; while (busy) await wait(10); const mv = bestMove(state, 1); if (mv === null) break; await doMove(mv); } fast = false; return { winner: state.winner, stores: state.stores }; },
+    puzzles: {
+      open: () => puzzleUI?.openPicker(),
+      current: () => puzzleUI?.current(),
+      exit: () => puzzleUI?.exit(),
+    },
+    async autoplay(maxTurns = 120) {
+      fast = true;
+      let n = 0;
+      while (state.winner === null && n < maxTurns) {
+        n++;
+        while (busy) await wait(10);
+        const stream = aiRng(state.turn); const beforeDraws = stream.draws;
+        const mv = bestMove(state, 1, stream);
+        if (mv === null) break;
+        await doMove(mv, rngUse(stream, beforeDraws));
+      }
+      fast = false;
+      return { winner: state.winner, stores: state.stores };
+    },
     rendererInfo: () => renderer.info.render,
+    rngInfo: () => ({ algorithm: rng.algorithm, seed: rng.seed, streams: rng.snapshot() }),
+    logInfo: () => save?.log,
     settingsInfo: () => ({ ...settingsApi.get(), bloomEnabled: bloom.enabled, bloomStrength: bloom.strength, grand: grand.info(), coach: coach.info() }),
   };
 
@@ -446,11 +1034,47 @@ async function main() {
     setView: (v) => { az = v.az; pol = v.pol; dist = v.dist; },
     place,
     reducedMotion: settingsApi.get().reducedMotion || matchMedia('(prefers-reduced-motion: reduce)').matches,
-  }).finally(() => {
+  }).finally(async () => {
     document.body.classList.remove('cinematic-opening');
     busy = false;
-    if (!(save.hasSaved() && save.resume())) loop();
+    let resumed = null;
+    if (save.hasSaved()) resumed = save.resume(rng.seed);
+    if (resumed) {
+      const replayed = derive(resumed.log, engine);
+      rng = replayed.rng;
+      storeSeed();
+      applyStateVisual(replayed.state);
+    } else {
+      save.begin(freshLog());
+      busy = true;
+      await maybeAutoDemo({
+        id: 'am',
+        adapter: engine,
+        applyState: (next) => { applyStateVisual(next); busy = true; },
+        freshState: () => {
+          const replayed = derive(save.log, engine);
+          rng = replayed.rng;
+          storeSeed();
+          applyStateVisual(replayed.state);
+        },
+        audio,
+        accent: T.accent,
+        stepMs: 1400,
+        reducedMotion: settingsApi.get().reducedMotion
+          || matchMedia('(prefers-reduced-motion: reduce)').matches,
+      });
+      profile.bump('games.played');
+    }
+    busy = false;
+    loop();
     updateUndo();
+    openingDone = true;
+    maybeLaunchHash();
+    resetAttractTimer();
   });
 }
-main().catch((e) => { console.error(e); const s = document.querySelector('#status'); if (s) s.textContent = 'Error: ' + e.message; });
+main().catch((e) => {
+  console.error(e);
+  const s = document.querySelector('#status');
+  if (s) s.textContent = tr('Error: %s').replace('%s', e.message);
+});

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "am.puzzle.make-four",
+    "difficulty": "easy",
+    "file": "am.puzzle.make-four.json"
+  },
+  {
+    "id": "am.puzzle.beyond-empty",
+    "difficulty": "easy",
+    "file": "am.puzzle.beyond-empty.json"
+  },
+  {
+    "id": "am.puzzle.long-relay",
+    "difficulty": "medium",
+    "file": "am.puzzle.long-relay.json"
+  },
+  {
+    "id": "am.puzzle.harvest-relay",
+    "difficulty": "medium",
+    "file": "am.puzzle.harvest-relay.json"
+  },
+  {
+    "id": "am.puzzle.final-sweep",
+    "difficulty": "hard",
+    "file": "am.puzzle.final-sweep.json"
+  },
+  {
+    "id": "am.puzzle.last-count",
+    "difficulty": "hard",
+    "file": "am.puzzle.last-count.json"
+  }
+]

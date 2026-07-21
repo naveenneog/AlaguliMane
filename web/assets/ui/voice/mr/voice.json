@@ -1,0 +1,8 @@
+{
+ "The board has two rows of seven pits, with six seeds in every pit. Counting is your strategy.": "8a91d5eba3ce.opus",
+ "Lift every seed from one pit and sow one into each following pit.": "fae218763d0f.opus",
+ "If the pit after your last seed is occupied, lift those seeds and continue—the sowing becomes a relay.": "473de7c6ddda.opus",
+ "Here one seed lands in pit one; pit two is empty, so the seeds beyond it in pit three are gathered.": "00857c8ca0b1.opus",
+ "Pit eleven holds three. Sow the single seed from pit ten: the fourth seed completes the set.": "1467937c6ee6.opus",
+ "All four seeds leave the pit and enter your store. Plan each relay to create more gathering fours.": "22aba060790c.opus"
+}

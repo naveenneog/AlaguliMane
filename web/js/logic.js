@@ -84,17 +84,20 @@ function search(state, depth, alpha, beta, root) {
   let best = Infinity; for (const m of moves) { best = Math.min(best, search(applyMove(state, m), depth - 1, alpha, beta, root)); beta = Math.min(beta, best); if (alpha >= beta) break; } return best;
 }
 
-export function bestMove(state, level = 2) {
+// Optional seeded generator breaks equal-score ties without perturbing minimax ordering.
+export function bestMove(state, level = 2, rng = null) {
   const moves = legalMoves(state);
-  if (moves.length <= 1) return moves[0] ?? null;
+  if (moves.length === 0) return null;
+  if (moves.length === 1) return rng ? rng.pick(moves) : moves[0];
   const depth = [0, 2, 4, 6][level] || 4;
   const root = state.turn;
-  let best = moves[0], bestScore = -Infinity;
+  let bestMoves = [], bestScore = -Infinity;
   for (const m of moves) {
     const sc = search(applyMove(state, m), depth - 1, -Infinity, Infinity, root);
-    if (sc > bestScore) { bestScore = sc; best = m; }
+    if (sc > bestScore) { bestScore = sc; bestMoves = [m]; }
+    else if (sc === bestScore) bestMoves.push(m);
   }
-  return best;
+  return rng ? rng.pick(bestMoves) : bestMoves[0];
 }
 
 // ---------------------------------------------------------------- world data

@@ -1,0 +1,36 @@
+{
+  "game": "am",
+  "version": "1.6.0",
+  "puzzles": [
+    {
+      "id": "am.puzzle.make-four",
+      "difficulty": "easy",
+      "titleKey": "am.puzzle.make-four.title"
+    },
+    {
+      "id": "am.puzzle.beyond-empty",
+      "difficulty": "easy",
+      "titleKey": "am.puzzle.beyond-empty.title"
+    },
+    {
+      "id": "am.puzzle.long-relay",
+      "difficulty": "medium",
+      "titleKey": "am.puzzle.long-relay.title"
+    },
+    {
+      "id": "am.puzzle.harvest-relay",
+      "difficulty": "medium",
+      "titleKey": "am.puzzle.harvest-relay.title"
+    },
+    {
+      "id": "am.puzzle.final-sweep",
+      "difficulty": "hard",
+      "titleKey": "am.puzzle.final-sweep.title"
+    },
+    {
+      "id": "am.puzzle.last-count",
+      "difficulty": "hard",
+      "titleKey": "am.puzzle.last-count.title"
+    }
+  ]
+}
